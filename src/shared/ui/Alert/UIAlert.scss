@@ -1,0 +1,78 @@
+.alert__overlay {
+    position: fixed;
+    inset: 0;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    background-color: $black-70;
+}
+
+.alert__content {
+    width: 90vw;
+    max-width: 27.6rem;
+    max-height: 85vh;
+    padding: 2rem;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    background-color: $white;
+    border-radius: 0.8rem;
+    text-align: center;
+    transform: translate(-50%, -50%);
+    animation: contentShow 150ms cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 2000;
+    @include display-flex($display: flex, $flexDirection: column, $justifyContent: center, $alignItems: center);
+
+    &:focus {
+        outline: none;
+    }
+
+    .alert__title {
+        margin-top: 1rem;
+    }
+
+    .alert__description__box {
+        @include flex-center();
+        height: 8rem;
+        margin-bottom: 1rem;
+
+        .alert__description {
+            @include flex-center();
+            display: -webkit-box;
+            -webkit-line-clamp: 3; // 최대 3줄로 제한
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+    }
+
+    .alert__buttons {
+        @include flex-center();
+        width: 100%;
+        gap: 10;
+
+        button + button {
+            margin-left: 1rem;
+        }
+    }
+}
+
+@keyframes overlayShow {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes contentShow {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -48%) scale(0.96);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+}

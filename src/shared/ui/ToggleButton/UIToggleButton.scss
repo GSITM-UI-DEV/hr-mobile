@@ -1,0 +1,51 @@
+.toggle_button__box {
+    // @include flex-center();
+    display: inline-flex;
+    padding: 0.3rem;
+    border-radius: 99.9rem;
+    background: $background-secondary;
+    position: relative;
+    .toggle_button__item {
+        @include flex-center();
+        height: 2.4rem;
+        padding: 0rem 1.6rem;
+        color: $text-fourth;
+        border-radius: 99.9rem;
+        z-index: 1;
+
+        &[data-state="on"] {
+            color: $text-primary;
+        }
+
+        &:hover,
+        &:focus {
+            outline: none;
+            border: none;
+        }
+    }
+
+    .switch__active {
+        width: 2rem;
+        height: 2.4rem;
+        left: 0;
+        background-color: $white;
+        position: absolute;
+        transition: width 0.3s ease, transform 0.3s ease;
+    }
+
+    &.is-disabled {
+        background-color: $background-secondary;
+
+        .toggle_button__item {
+            cursor: not-allowed;
+            color: $gray-300;
+            // &[data-state="on"] {
+            //     background-color: $background-primary;
+            // }
+        }
+
+        .switch__active {
+            background-color: $background-primary;
+        }
+    }
+}

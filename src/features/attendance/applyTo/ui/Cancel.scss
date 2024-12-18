@@ -1,0 +1,41 @@
+.cancel__list {
+  border-top: 0.1rem solid #444;
+  > li {
+    padding: 1.2rem 0;
+    border-bottom: 0.1rem solid #E4E4E4;
+    > .cancel {
+      > .cancel__check {
+        
+      }
+      > .cancel__info {
+        margin: 0.8rem 0 0.4rem;
+        font-size: 1.4rem;
+        > div {
+          display: flex;
+          flex-wrap: wrap;
+          padding-bottom: 0.4rem;
+          line-height: 2.1rem;
+          strong {
+            display: flex;
+            min-width: 12rem;
+            color: #8D8D8D;
+            font-weight: 400;
+          }
+          span {
+            display: flex;
+            color: #444;
+          }
+        }
+        > .reason {
+          > strong {
+            display: block;
+            margin-bottom: 0.4rem;
+          }
+        }
+      }
+      > .cancel__reason {
+        
+      }
+    }
+  }
+}

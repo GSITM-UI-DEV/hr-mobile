@@ -1,0 +1,144 @@
+*,
+*::before,
+*::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    outline: none;
+}
+
+html {
+    font-size: 62.5%;
+
+    &:lang(ko) {
+        word-break: keep-all;
+    }
+}
+
+body {
+    // ::-webkit-scrollbar {
+    //   width: 1.6rem;
+    //   height: 1.6rem;
+    //   background: transparent;
+    // }
+    // ::-webkit-scrollbar-thumb{
+    //   width: .8rem;
+    //   border-radius: 1rem;
+    //   border: .4rem solid #fff;
+
+    //   &:hover {
+    //     background: $gray-200;
+    //   }
+    //   &:active,
+    //   &:focus {
+    //     background: $gray-200;
+    //   }
+    // }
+    // ::-webkit-scrollbar-track {
+    //   background: transparent;
+    // }
+    // overflow-wrap: break-word;
+    // text-size-adjust: 100%;
+}
+
+main {
+    display: block;
+}
+
+ol,
+ul,
+li {
+    list-style: none;
+}
+
+button,
+fieldset,
+iframe,
+input,
+select,
+textarea {
+    border: 0;
+}
+
+button,
+dialog,
+input,
+mark,
+meter,
+progress {
+    background-color: transparent;
+}
+
+table {
+    border: 0;
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+
+button,
+input,
+meter,
+progress,
+select,
+textarea {
+    appearance: none;
+}
+
+button,
+a {
+    cursor: pointer;
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+    vertical-align: top;
+}
+
+iframe {
+    border: 0;
+}
+
+a {
+    text-decoration: none;
+}
+
+em {
+    font-style: normal;
+}
+
+// for Firefox
+::-moz-placeholder {
+    opacity: 1;
+}
+
+// for Internet Explorer
+::-ms-clear,
+::-ms-reveal {
+    display: none;
+}
+
+/*
+[ CSS Reset by ]
+∙ [class] - Samsung Internet, Internet Explorer does supports it.(2021-07)
+∙ :where - Internet Explorer 11 does not support.(2022-09)
+
+[class] {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+[class]::before,
+[class]::after { box-sizing: border-box; }
+[class]:where(ol, ul) { list-style: none; }
+[class]:where(button, fieldset, iframe, input, select, textarea) { border: 0; }
+[class]:where(button, dialog, input, mark, meter, progress) { background-color: transparent; }
+[class]:where(table) {
+  border: 0;
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+[class]:where(button, input, meter, progress, select, textarea) {
+  appearance: none;
+}
+*/

@@ -1,0 +1,115 @@
+.badge {
+    @include flex-center();
+    border-radius: 99.9rem;
+    font-size: 1.3rem;
+
+    &.is-dot {
+        width: 0.6rem;
+        height: 0.6rem;
+        padding: 0;
+        margin: 1rem;
+
+        &.is-red,
+        &.is-danger {
+            background-color: $danger-main;
+        }
+
+        &.is-green,
+        &.is-primary {
+            background-color: $success-main;
+        }
+    }
+
+    &.is-number {
+        height: 18px;
+        padding: 0 0.5rem;
+        font-size: 1.2rem;
+
+        &.is-red,
+        &.is-danger {
+            background-color: $danger-main;
+            color: $white;
+        }
+
+        &.is-green,
+        &.is-primary {
+            background-color: $success-main;
+            color: $white;
+        }
+    }
+
+    &.is-text {
+        background: none !important;
+        &.is-green,
+        &.is-primary {
+            color: $brand-primary-dark;
+        }
+    }
+
+    &.is-normal {
+        padding: 0.2rem 0.8rem;
+        color: $white;
+        &.is-green,
+        &.is-primary {
+            background-color: $brand-primary-main;
+        }
+        &.is-gray,
+        &.is-secondary {
+            color: $text-fourth;
+            background-color: $background-secondary;
+        }
+    }
+
+    &.is-border {
+        border: 1px solid;
+        padding: 0.2rem 0.8rem;
+
+        &.is-green,
+        &.is-primary {
+            color: $success-main;
+            border-color: $success-main;
+        }
+
+        &.is-red,
+        &.is-danger {
+            color: $danger-main;
+            border-color: $danger-main;
+        }
+
+        &.is-yellow,
+        &.is-warning {
+            color: $warning-main;
+            border-color: $warning-main;
+        }
+
+        &.is-blue,
+        &.is-information {
+            color: $information-main;
+            border-color: $information-main;
+        }
+
+        &.is-gray,
+        &.is-secondary {
+            color: $text-fourth;
+            border-color: $text-fourth;
+        }
+    }
+
+    &.is-square {
+        border-radius: 0.4rem;
+    }
+}
+
+.badgeLayerd {
+    position: relative;
+    .badge {
+        position: absolute;
+        top: -1rem;
+        right: -1rem;
+
+        &.is-number.is-layerd {
+            top: -0.1rem;
+            right: 0rem;
+        }
+    }
+}

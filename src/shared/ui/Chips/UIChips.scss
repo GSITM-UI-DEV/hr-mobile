@@ -1,0 +1,57 @@
+.chips__group {
+    @include display-flex($display: flex);
+
+    .chips__box {
+        & + .chips__box {
+            margin-left: 2rem;
+        }
+    }
+}
+.chips__box {
+    .chips__root {
+        @include display-flex($display: flex, $alignItems: center);
+        @include bg-fix($size: 1.4rem);
+        height: 4.8rem;
+        padding: 0rem 2rem 0rem 1.6rem;
+        background-color: $white;
+        border: 0.2rem solid $gray-300;
+        border-radius: 99.9rem;
+
+        .chips__indicator {
+            width: 2rem;
+            height: 2rem;
+        }
+
+        .chips__label {
+            color: $text-primary;
+            line-height: 150%;
+            margin-left: 1rem;
+        }
+
+        &.is-disabled,
+        &[disabled] {
+            border-color: $border-primary;
+            background: $background-primary;
+
+            .chips__label {
+                color: $text-disabled;
+            }
+        }
+
+        &[data-state="checked"] {
+            border: 0.2rem solid $gray-800;
+            background: $background-primary;
+
+            &.is-disabled,
+            &[disabled] {
+                background-color: $gray-400;
+                background: $background-primary;
+                border-color: $border-primary;
+
+                .chips__label {
+                    color: $text-disabled;
+                }
+            }
+        }
+    }
+}

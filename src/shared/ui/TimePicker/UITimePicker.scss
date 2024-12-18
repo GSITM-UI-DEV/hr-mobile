@@ -1,0 +1,93 @@
+.timepicker__box {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    // max-width: 36rem;
+    width: 100%;
+    position: relative;
+
+    .timepicker__label {
+        color: $text-tertiary;
+        font-size: 1.3rem;
+        font-style: normal;
+        font-weight: 400;
+        line-height: 200%;
+    }
+
+    .timepicker__trigger {
+        position: relative;
+        width: 100%;
+        .timepicker__icon {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            margin-top: -1.2rem;
+            z-index: 1;
+        }
+
+        button {
+            padding: 0.3em 0.5em;
+            white-space: nowrap;
+        }
+
+        .timepicker {
+            border-width: 0.1rem;
+            border-style: solid;
+            border-color: $gray-200;
+            background-color: $white;
+            border-radius: 0.6rem;
+            width: 100%;
+            height: 4.8rem;
+            font-size: 1.5rem;
+            line-height: 150%;
+            padding: 0 1rem;
+            box-sizing: border-box;
+            font-family: Pretendard;
+            position: relative;
+
+            &:focus-within,
+            &[data-state="open"] {
+                border-color: $primary;
+            }
+
+            &.is-error {
+                border-color: $danger-main;
+            }
+
+            &.is-disabled,
+            &[disabled] {
+                border-color: $gray-200;
+                background-color: $background-secondary;
+                color: $text-disabled;
+            }
+
+            &.is-readOnly,
+            &[readOnly] {
+                border-color: $text-disabled;
+                background-color: $background-secondary;
+            }
+
+            // input의 시계모양 아이콘을 눌러야 시간 선택이 가능
+            // input 중 아무데나 눌러도 선택 가능하게 꽉 채운 것
+            &::-webkit-inner-spin-button,
+            &::-webkit-calendar-picker-indicator {
+                opacity: 0;
+                width: 100%;
+                height: 100%;
+                z-index: 2;
+                position: absolute;
+            }
+        }
+    }
+
+    .timepicker__range__trigger {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+
+        > * + * {
+            margin-left: 1rem;
+        }
+    }
+}

@@ -1,0 +1,194 @@
+//
+// Generate Palettes
+//
+
+// Docs Colors
+@each $color, $value in $docs-colors {
+  .text-docs-#{$color} {
+    color: $value !important;
+  }
+  .bg-docs-#{$color} {
+    background-color: $value !important;
+  }
+  .border-docs-#{$color} {
+    border-color: $value !important;
+  }
+}
+
+// Primary Scale Colors
+@each $color, $value in $primary-colors {
+  .text-primary-#{$color} {
+    color: $value !important;
+  }
+  .bg-primary-#{$color} {
+    background-color: $value !important;
+  }
+  .border-primary-#{$color} {
+    border-color: $value !important;
+  }
+}
+
+// Secondary Scale Colors
+@each $color, $value in $primary-colors {
+  .text-secondary-#{$color} {
+    color: $value !important;
+  }
+  .bg-secondary-#{$color} {
+    background-color: $value !important;
+  }
+  .border-secondary-#{$color} {
+    border-color: $value !important;
+  }
+}
+
+
+// Gray Scale Colors
+@each $color, $value in $gray-colors {
+  .text-gray-#{$color} {
+    color: $value !important;
+  }
+  .bg-gray-#{$color} {
+    background-color: $value !important;
+  }
+  .border-gray-#{$color} {
+    border-color: $value !important;
+  }
+}
+
+// Brand Primary Scale Colors
+@each $color, $value in $brand-primary-colors {
+  .text-brand-primary-#{$color} {
+    color: $value !important;
+  }
+  .bg-brand-primary-#{$color} {
+    background-color: $value !important;
+  }
+  .border-brand-primary-#{$color} {
+    border-color: $value !important;
+  }
+}
+
+// Brand Secondary Scale Colors
+@each $color, $value in $brand-secondary-colors {
+  .text-brand-secondary-#{$color} {
+    color: $value !important;
+  }
+  .bg-brand-secondary-#{$color} {
+    background-color: $value !important;
+  }
+  .border-brand-secondary-#{$color} {
+    border-color: $value !important;
+  }
+}
+
+// Danger Colors
+@each $color, $value in $danger-colors {
+  .text-danger-#{$color} {
+    color: $value !important;
+  }
+  .bg-danger-#{$color} {
+    background-color: $value !important;
+  }
+  .border-danger-#{$color} {
+    border-color: $value !important;
+  }
+}
+
+// Warning Colors
+@each $color, $value in $warning-colors {
+  .text-warning-#{$color} {
+    color: $value !important;
+  }
+  .bg-warning-#{$color} {
+    background-color: $value !important;
+  }
+  .border-warning-#{$color} {
+    border-color: $value !important;
+  }
+}
+
+// Success Colors
+@each $color, $value in $success-colors {
+  .text-success-#{$color} {
+    color: $value !important;
+  }
+  .bg-success-#{$color} {
+    background-color: $value !important;
+  }
+  .border-success-#{$color} {
+    border-color: $value !important;
+  }
+}
+
+// Information Colors
+@each $color, $value in $information-colors {
+  .text-information-#{$color} {
+    color: $value !important;
+  }
+  .bg-information-#{$color} {
+    background-color: $value !important;
+  }
+  .border-information-#{$color} {
+    border-color: $value !important;
+  }
+}
+
+// Text Colors
+@each $color, $value in $text-colors {
+  .text-#{$color} {
+    color: $value !important;
+  }
+}
+
+// Background Colors
+@each $color, $value in $background-colors {
+  .bg-#{$color} {
+    color: $value !important;
+  }
+}
+
+// Background Colors
+@each $color, $value in $border-colors {
+  .border-#{$color} {
+    border-color: $value !important;
+  }
+}
+
+// Point Colors
+@each $color, $value in $point-colors {
+  .text-point-#{$color} {
+    color: $value !important;
+  }
+  .bg-point-#{$color} {
+    background-color: $value !important;
+  }
+  .border-point-#{$color} {
+    border-color: $value !important;
+  }
+}
+
+// Black(Opacity) Colors
+@each $color, $value in $black-colors {
+  .text-black-#{$color} {
+    color: $value !important;
+  }
+  .bg-black-#{$color} {
+    background-color: $value !important;
+  }
+  .border-black-#{$color} {
+    border-color: $value !important;
+  }
+}
+
+// White(Opacity) Colors
+@each $color, $value in $white-colors {
+  .text-white-#{$color} {
+    color: $value !important;
+  }
+  .bg-white-#{$color} {
+    background-color: $value !important;
+  }
+  .border-white-#{$color} {
+    border-color: $value !important;
+  }
+}

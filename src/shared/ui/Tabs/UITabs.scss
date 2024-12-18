@@ -1,0 +1,47 @@
+.tab__box {
+    width: 100vw;
+    .tab__root {
+        width: 100%;
+        .tab__list {
+            width: 100%;
+            div[role="tablist"] {
+                width: 100%;
+                @include display-flex($display: flex);
+                overflow-x: scroll;
+                white-space: nowrap;
+                padding: 0 1rem;
+
+                scrollbar-width: none;
+                -ms-overflow-style: none;
+                &::-webkit-scrollbar {
+                    display: none;
+                }
+
+                .tab {
+                    height: 4rem;
+                    padding: 0rem 2rem;
+                    border-radius: 99.9rem;
+                    background: $background-primary;
+                    & + .tab {
+                        margin-left: 0.4rem;
+                    }
+
+                    &[data-state="active"] {
+                        color: $white;
+                        background-color: $background-fourth;
+                    }
+
+                    &.is-diabled,
+                    &[disabled] {
+                        color: $text-disabled;
+                        background-color: $background-tertiary;
+                    }
+                }
+            }
+        }
+        .tab__content {
+            width: 100%;
+            padding: 2rem;
+        }
+    }
+}

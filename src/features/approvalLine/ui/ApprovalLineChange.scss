@@ -1,0 +1,24 @@
+.approval__search {
+  padding: 0.8rem 1.2rem;
+}
+.approval__org {
+  padding: 0.8rem 1.2rem;
+  .orgs {
+    ul > li {
+      .name {
+        display: flex;
+        span {
+          display: flex;
+          align-items: center;
+          font-size: 1.3rem;
+        }
+      }
+      ul > li {
+        padding-left: 3.2rem;
+        .checkbox__group {
+          padding-left: 3.2rem;
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,25 @@
+
+
+
+
+.approval__line {
+  ul {
+    padding: 0 2rem;
+    
+    li {
+      padding: 1.2rem 0;
+      border-bottom: 0.1rem solid #E4E4E4;
+      > strong {
+        display: block;
+        color: #6AC688;
+        font-size: 1.3rem;
+        font-weight: 500;
+      }
+      > div {
+        margin-top: 0.6rem;
+        display: flex;
+        gap: 1.2rem;
+      }
+    }
+  }
+}

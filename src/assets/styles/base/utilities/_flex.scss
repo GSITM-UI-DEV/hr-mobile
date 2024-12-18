@@ -1,0 +1,99 @@
+// Display
+.d-flex {
+    @include display-flex($display: flex);
+}
+
+.d-inline-flex {
+    @include display-flex($display: inline-flex);
+}
+
+// Justify content
+.justify-content-start {
+    @include display-flex($justifyContent: start !important);
+}
+
+.justify-content-end {
+    @include display-flex($justifyContent: end !important);
+}
+
+.justify-content-center {
+    @include display-flex($justifyContent: center !important);
+}
+
+.justify-content-between {
+    @include display-flex($justifyContent: space-between !important);
+}
+
+.justify-content-around {
+    @include display-flex($justifyContent: space-around !important);
+}
+
+.justify-content-evenly {
+    @include display-flex($justifyContent: space-evenly !important);
+}
+
+// Align items
+.align-items-start {
+    @include display-flex($alignItems: flex-start !important);
+}
+
+.align-items-end {
+    @include display-flex($alignItems: flex-end !important);
+}
+
+.align-items-center {
+    @include display-flex($alignItems: center !important);
+}
+
+.align-items-baseline {
+    @include display-flex($alignItems: baseline !important);
+}
+
+.align-items-stretch {
+    @include display-flex($alignItems: stretch !important);
+}
+
+// Flex Direction
+.flex-direction-revert {
+    @include display-flex($flexDirection: revert !important);
+}
+
+.flex-direction-row {
+    @include display-flex($flexDirection: row !important);
+}
+
+.flex-direction-row-reverse {
+    @include display-flex($flexDirection: row-reverse !important);
+}
+
+.flex-direction-column {
+    @include display-flex($flexDirection: column !important);
+}
+
+.flex-direction-column-reverse {
+    @include display-flex($flexDirection: column-reverse !important);
+}
+
+// Flex Center
+.flex-center {
+    @include flex-center();
+}
+
+.inline-flex-center {
+    @include inline-flex-center();
+}
+
+// Flex grow
+.flex-grow-1 {
+    flex-grow: 1;
+}
+
+
+// Flex Wrap
+.flex-wrap {
+    @include display-flex($flexWrap: wrap !important);
+}
+
+.flex-nowrap {
+    @include display-flex($flexWrap: nowrap !important);
+}

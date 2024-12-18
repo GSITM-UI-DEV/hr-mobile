@@ -1,0 +1,86 @@
+.button {
+    @include flex-center();
+    width: 100%;
+    // max-width: 15.5rem;
+    padding: 1.2rem 0rem;
+    color: $text-primary;
+    font-size: 1.6rem;
+    border-radius: 99.9rem;
+    cursor: pointer;
+
+    &.is-primary {
+        color: $white;
+        border: none;
+        background-color: $brand-primary-main;
+        &:active {
+            background-color: $brand-primary-dark;
+        }
+    }
+
+    &.is-secondary {
+        color: $white;
+        border: none;
+        background-color: $background-fourth;
+        &:active {
+            background-color: $gray-900;
+        }
+    }
+
+    &.is-border {
+        color: $text-primary;
+        border: 0.1rem solid $gray-800;
+        background-color: $white;
+
+        &.is-disabled,
+        &[disabled] {
+            color: $text-disabled;
+            border: 0.1rem solid $gray-200;
+            background-color: $white;
+            &:active {
+                background-color: $white;
+            }
+        }
+
+        &:active {
+            background-color: $background-primary;
+        }
+    }
+
+    &.is-small {
+        width: auto;
+        height: 4rem;
+        font-size: 1.4rem;
+        padding: 0.95rem 2rem;
+        &.square {
+            padding: 0.4rem 1.2rem;
+            border-radius: 0.6rem;
+        }
+    }
+
+    &.is-text {
+        width: auto;
+        height: 4rem;
+        padding: 0.95rem 2rem;
+        &:active {
+            background-color: $background-tertiary;
+        }
+
+        &.is-disabled,
+        &[disabled] {
+            color: $text-disabled;
+            background: none;
+            &:active {
+                background: none;
+            }
+        }
+    }
+
+    &.is-disabled,
+    &[disabled] {
+        cursor: not-allowed;
+        background-color: $gray-200;
+        &:active {
+            background-color: $gray-200;
+        }
+    }
+}

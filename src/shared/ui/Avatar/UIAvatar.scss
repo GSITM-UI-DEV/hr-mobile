@@ -1,0 +1,42 @@
+.avatarBox {
+    position: relative;
+
+    .avatar__root {
+        @include flex-center();
+        border-radius: 99.9rem;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .avatar__icon {
+        position: absolute;
+        z-index: 1;
+        right: 0;
+        bottom: 0;
+    }
+
+    &.is-small {
+        .avatar__root {
+            width: 3.6rem;
+            height: 3.6rem;
+        }
+        .avatar__icon {
+            right: -1rem;
+        }
+    }
+    &.is-medium {
+        .avatar__root {
+            width: 5.2em;
+            height: 5.2rem;
+        }
+        .avatar__icon {
+            right: -0.5rem;
+        }
+    }
+    &.is-large {
+        .avatar__root {
+            width: 8rem;
+            height: 8rem;
+        }
+    }
+}

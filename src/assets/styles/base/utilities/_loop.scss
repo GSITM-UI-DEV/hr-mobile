@@ -1,0 +1,152 @@
+// variables.scss에 최대값 지정해줘야함.
+// Padding
+@for $i from 0 through $paddingMax {
+    .p-#{$i} {
+        padding: $i * 0.1 + rem !important;
+    }
+
+    .pt-#{$i} {
+        padding-top: $i * 0.1 + rem !important;
+    }
+
+    .pb-#{$i} {
+        padding-bottom: $i * 0.1 + rem !important;
+    }
+
+    .pl-#{$i} {
+        padding-left: $i * 0.1 + rem !important;
+    }
+
+    .pr-#{$i} {
+        padding-right: $i * 0.1 + rem !important;
+    }
+
+    .prl-#{$i} {
+        padding-right: $i * 0.1 + rem !important;
+        padding-left: $i * 0.1 + rem !important;
+    }
+
+    .ptb-#{$i} {
+        padding-top: $i * 0.1 + rem !important;
+        padding-bottom: $i * 0.1 + rem !important;
+    }
+}
+
+// Margin
+@for $i from 0 through $marginMax {
+    .m-#{$i} {
+        margin: $i * 0.1 + rem !important;
+    }
+
+    .mt-#{$i} {
+        margin-top: $i * 0.1 + rem !important;
+    }
+
+    .mb-#{$i} {
+        margin-bottom: $i * 0.1 + rem !important;
+    }
+
+    .ml-#{$i} {
+        margin-left: $i * 0.1 + rem !important;
+    }
+
+    .mr-#{$i} {
+        margin-right: $i * 0.1 + rem !important;
+    }
+
+    .mrl-#{$i} {
+        margin-right: $i * 0.1 + rem !important;
+        margin-left: $i * 0.1 + rem !important;
+    }
+
+    .mtb-#{$i} {
+        margin-top: $i * 0.1 + rem !important;
+        margin-bottom: $i * 0.1 + rem !important;
+    }
+}
+
+// Gap
+@for $i from 0 through $gapMax {
+    .gap-#{$i} {
+        gap: $i * 0.1 + rem !important;
+    }
+
+    .column-gap-#{$i} {
+        column-gap: $i * 0.1 + rem !important;
+    }
+
+    .row-gap-#{$i} {
+        row-gap: $i * 0.1 + rem !important;
+    }
+}
+
+// Border Radius
+@for $i from 0 through $radiusMax {
+    .radius-#{$i} {
+        border-radius: $i * 0.1 + rem !important;
+    }
+
+    .radius-t-#{$i} {
+        border-top-left-radius: $i * 0.1 + rem !important;
+        border-top-right-radius: $i * 0.1 + rem !important;
+    }
+
+    .radius-b-#{$i} {
+        border-bottom-left-radius: $i * 0.1 + rem !important;
+        border-bottom-right-radius: $i * 0.1 + rem !important;
+    }
+}
+
+// Opacity
+@for $i from 0 through 100 {
+    .opacity-#{$i} {
+        column-gap: $i * 0.01 !important;
+    }
+}
+
+// Font-size
+@for $i from 1 through $fontSizeMax {
+    .fs-#{$i} {
+        font-size: $i * 0.1 + rem !important;
+    }
+}
+
+// Font-weight
+@for $i from 1 through 9 {
+    .fw-#{$i * 100} {
+        font-weight: $i * 100 !important;
+    }
+}
+
+// @for $i from 1 through 10 {
+//     .is-col-#{$i} {
+//         flex-wrap: wrap;
+
+//         > * {
+//             @if (var(--gap) == 0) {
+//                 flex-basis: calc(100% / #{$i});
+//             } @else {
+//                 flex-basis: calc((100% / #{$i}) - var(--gap) / #{$i} * (#{$i} - 1));
+//             }
+//         }
+//     }
+// }
+
+@mixin colEquar($cols: null) {
+    &:first-child:nth-last-child(n),
+    &:first-child:nth-last-child(n) ~ * {
+        width: calc(100% / #{$cols} - (var(--gap, 0) / #{$cols}) * (#{$cols} - 1));
+    }
+}
+
+@for $i from 1 through 10 {
+    .is-col-#{$i} {
+        flex-wrap: wrap;
+        --gap: 0rem; // 기본 gap 값 설정
+
+        > * {
+            // $cols에는 단위 없이 숫자만 전달
+            @include colEquar($cols: #{$i});
+        }
+    }
+}
