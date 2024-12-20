@@ -96,16 +96,19 @@ export interface WelfareStatus {
 
 
 
+type FundAcct = {
+  payacctNo: string,
+  bankCode: string,
+  payacctDepositorName: string
+}
+type FundCost = {
+  costCd: string,
+  costNm: string,
+}
 // 경조사
 export interface WelfareFund {
-	artmouInd: string,
-	leaveCnt: number,
-	payAmt: number,
-	wreathInd: string,
-	cncCode: string,
-	relCode: string,
-	eventDate: string,
-	supportInd: string,
+	acct: FundAcct[],
+	cost: FundCost[],
 }
 
 // 보험

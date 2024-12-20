@@ -1,34 +1,17 @@
 import { axiosInstance } from "@/app/api/axiosInstance";
-import { useAuthStore } from "@/app/store/authStore";
-import { useApprovalLine } from "@/entities/approvalLine";
-import { useFundBank } from "@/entities/welfare/api/useWelfare";
+import { useApprovalDocument, useApprovalForm, useApprovalLine, useBaseCode } from "@/entities/approvalLine";
+import { useUser } from "@/entities/user";
+import { useFundBank } from "@/entities/welfare";
+import { formatByType } from "@/shared/lib/formatByType";
 import { UIAlert, UIButton, UIDatePicker, UIIconButton, UIInput, UISelect, UIToast } from "@/shared/ui";
 import { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+
+
+
 
 export const Fund = () => {
-  const navigate = useNavigate();
-  const auth = useAuthStore((state) => state.auth);
-
-
-  // 결재선
-  const { data: approvalLineData, isLoading: isApprovalLineLoading, error: approvalLineError } = useApprovalLine({formId: 'CL', emplNo: auth?.username});
-  // const { data: approvalLineData, isLoading: isApprovalLineLoading, error: approvalLineError } = useApprovalLine({
-  //   formId: selectedForm?.formId,
-  //   emplNo: userData.loginUserId,
-  // });
-  if (isApprovalLineLoading) return <p>Loading...</p>;
-  if (approvalLineError) return <p>Something went wrong!</p>;
-  // 계좌
-  const { data: fundBankData, isLoading: isFundBankLoading, error: fundBankError } = useFundBank(auth?.username);
-  if (isFundBankLoading) return <p>Loading...</p>;
-  if (fundBankError) return <p>Something went wrong!</p>;
-
-
   const [reason, setReason] = useState();
   const [relation, setRelation] = useState([]);
-
-
   const [form, setForm] = useState({
     filePath: "",
     cncCode: "",
@@ -39,81 +22,183 @@ export const Fund = () => {
     positionNameHan: "",
     eventDate: "",
     relCode: "",
+    objNameHan: "",
+    addRegEmplNo: "",
+    addRegEmplNameHan: "",
+    remark: "",
     costCenter: "",
     costName: "",
-    payAmt: 0,
-    leaveCnt: 0,
+    acctCode: "",
+    payAmt: "",
+    budgetAmt: "",
+    leaveCnt: "",
     bankCd: "",
     acctNo: "",
     acctDepositor: "",
+    reqRemark: "",
+    atchFileId: "",
+    fileItemCheck0: "",
     reqEmplNo: "",
     reqEmplName: "",
     docNo: "",
-    statusCode: 0,
+    statusCode: "",
     docTitlNm: "",
     formId: "",
     pgmId: "",
+    mblPgmId: "",
+    saveFlag: "",
+    bfDocNo: "",
+    wreathInd: "",
+    artmouInd: "",
+    addRegEmplOrg: "",
     aprvPathOrder: "",
-    aprvdetailDtoList: [],
-    files: [],
+    payType: "",
   });
+  const [errors, setErrors] = useState<Record<string, boolean>>({
+    cncCode: false,
+    eventDate: false,
+    relCode: false,
+    objNameHan: false,
+  }); // 에러 메시지 관리
+
+
+
+  // 결재선
+  const { data: userData, isLoading: isUserLoading, error: userError } = useUser();
+	if (isUserLoading) return <p>Loading...</p>;
+	if (userError) return <p>Error: {userError.message}</p>;
+
+  const { data: approvalFormData, isLoading: isApprovalFormLoading, error: approvalFormError } = useApprovalForm();
+  if (isApprovalFormLoading) return <p>Loading...</p>;
+  if (approvalFormError) return <p>Something went wrong!</p>;
+  const selectedForm = approvalFormData?.filter((i) => i.formId === "CL")[0]
+  
+  const { data: approvalLineData, isLoading: isApprovalLineLoading, error: approvalLineError } = useApprovalLine({
+    formId: selectedForm?.formId,
+    emplNo: userData.loginUserId,
+    recvEmplNo: userData.loginUserId,
+    ccCode: userData.loginUserId,
+    cncCode: form.cncCode,
+  });
+  if (isApprovalLineLoading) return <p>Loading...</p>;
+  if (approvalLineError) return <p>Something went wrong!</p>;
+
+  const { data: approvalDocumentData, isLoading: isApprovalDocumentLoading, error: approvalDocumentError } = useApprovalDocument(userData.loginUserId);
+  if (isApprovalDocumentLoading) return <p>Loading...</p>;
+  if (approvalDocumentError) return <p>Something went wrong!</p>;
+
+
+  // 경조 유형 코드 쿼리
+  const parameters = {
+    baseCodList: [
+      { "patternCode": "CN03", "effDateYn": true, "companyYn": true, "etc1Value": "Y" },
+      { "patternCode": "CN08", "effDateYn": true, "etc1Value": "Y", "companyYn": true },
+      { "patternCode": "PR02", "effDateYn": true, "companyYn": true },
+      { "patternCode": "CN12", "effDateYn": true, "companyYn": true },
+      { "patternCode": "CN09", "effDateYn": true, "companyYn": true }
+    ]
+  }
+  const { data: baseCodeData, isLoading: isBaseCodeLoading, error: baseCodeError } = useBaseCode(parameters);
+	if (isBaseCodeLoading) return <p>Loading...</p>;
+	if (baseCodeError) return <p>Something went wrong!</p>;
+  const codeData = baseCodeData && baseCodeData.map((code: any) =>
+    code.cdbaseList.map((cd: any) => (
+      {codeKey : cd.baseCode, codeName: cd.codeNameHan}
+    ))
+  )
+  const welfareFundCodeData = codeData[0];
+  const welfareFundCodeDataTarget = welfareFundCodeData?.map((codeItem: any) => { return {label: codeItem.codeName, error: false, query: codeItem.codeKey}})
+
+
+  // 신청자 계좌
+  const { data: fundBankData, isLoading: isFundBankLoading, error: fundBankError } = useFundBank({ emplNo: userData.loginUserId, coCode: userData.loginCoId });
+  if (isFundBankLoading) return <p>Loading...</p>;
+  if (fundBankError) return <p>Something went wrong!</p>;
+
+
+  // useEffect(() => {
+  //   if (approvalLineData && approvalLineData.length > 0) {
+  //     const updatedAprvdetailDtoList = approvalLineData.map((item, index) => ({
+  //       aprvType: item.aprvType,
+  //       aprvSeqNo: index + 1,
+  //       aprvEmplNo: item.emplNo,
+  //       statusCode: item.aprvDepth
+  //     }));
+  //     setForm((prevForm: any) => ({
+  //       ...prevForm,
+  //       aprvdetailDtoList: updatedAprvdetailDtoList,
+  //     }));
+  //   }
+
+
+  //   if (fundBankData) {
+  //     // setForm((prevForm) => ({
+  //     //   ...prevForm,
+  //     //   bankCd: fundBankData.acct[0].bankCd
+  //     // }));
+  //     // console.log(fundBankData)
+  //   }
+  // }, [approvalLineData, fundBankData]);
+
+
 
   useEffect(() => {
-    if (approvalLineData && approvalLineData.length > 0) {
-      const updatedAprvdetailDtoList = approvalLineData.map((item, index) => ({
-        aprvType: item.aprvType,
+    if (!fundBankData || !fundBankData.acct || !fundBankData.cost) {
+      return; // 데이터가 없으면 실행하지 않음
+    }
+    // 결재 라인-기안서 세팅 + 신청자정보(계좌 등) 세팅
+    setForm((prev) => ({
+      ...prev,
+      acctNo: fundBankData.acct[0]?.payacctNo || "",
+      bankCd: fundBankData.acct[0]?.bankCode || "",
+      costCenter: fundBankData.cost[0]?.costCd || "",
+      supportInd: "C",
+      payType: "5",
+
+      docNo: approvalDocumentData,
+      docTitlNm: `${selectedForm?.formName}-${userData.loginUserNm}`,
+      formId: selectedForm?.formId,
+      pgmId: selectedForm?.pgmId,
+      reqEmplNo: userData.loginUserId,
+      reqEmplName: userData.loginUserNm,
+      aprvPathOrder: approvalLineData.map(item => item.emplNameHan).join("^"),
+      aprvdetailDtoList: approvalLineData.map((item, index) => ({
+        docNo: approvalDocumentData,
         aprvSeqNo: index + 1,
+        aprvType: item.aprvType,
         aprvEmplNo: item.emplNo,
-        statusCode: item.aprvDepth
-      }));
-      setForm((prevForm: any) => ({
-        ...prevForm,
-        aprvdetailDtoList: updatedAprvdetailDtoList,
-      }));
-    }
-
-
-    if (fundBankData) {
-      // setForm((prevForm) => ({
-      //   ...prevForm,
-      //   bankCd: fundBankData.acct[0].bankCd
-      // }));
-      // console.log(fundBankData)
-    }
-  }, [approvalLineData, fundBankData]);
-
-  
+        transInd: "",
+        tarnsEmplNo: "",
+        statusCode: item.aprvDepth,
+      }))
+    }));
+  }, [userData, approvalLineData, approvalDocumentData, fundBankData])
 
 
   const handleSelect = async (item: any) => {
-    setReason(item);
     const { data } = await axiosInstance.get(`/uhr/docappr/apprcn600/relcodelist?cncCode=${item}`);
     const transformedData = data.map((item: any) => ({
       label: item.relCodeName,
       error: false,
       query: item.relCode,
     }));
+    setReason(item);
     setRelation(transformedData);
-    // return data;
   }
 
 
+  const [account, setAccount] = useState([]);
   const handleSelectRelation = async (item: any) => {
-    // console.log(reason);
-    // console.log(item);
     if (!reason) return;
-
-    const eventDateParams = form.eventDate.replace(/(\d{4})(\d{2})(\d{2})/g, '$1-$2-$3');
-    const response1 = await axiosInstance.get(`/uhr/docappr/apprcn600/cnpayrule?supportInd=C&cncCode=${reason}&relCode=${item}&eventDate=${eventDateParams}`);
-    console.log(response1.data);
-    const response2 = await axiosInstance.get(`/uhr/docappr/apprcn600/setacct?payType=5&emplNo=${auth?.username}&eventDate=${eventDateParams}`);
-    console.log(response2.data);
-    const response3 = await axiosInstance.get(`/uhr/docappr/apprcn600/docno?reqEmplNo=${auth?.username}`);
-    console.log(response3.data);
-    handleInputChange("docNo", response3.data);
+    const responsePay = await axiosInstance.get(`/uhr/docappr/apprcn600/cnpayrule?supportInd=${form.supportInd}&cncCode=${reason}&relCode=${item}&eventDate=${form.eventDate}&costCenter=${form.costCenter}&acctCode=`);
+    setForm((prevForm) => ({
+      ...prevForm,
+      payAmt: responsePay.data[0].payAmt
+    }));
+    const responseAcct = await axiosInstance.get(`/uhr/docappr/apprcn600/setacct?payType=${form.payType}&emplNo=${form.reqEmplNo}&eventDate=${form.eventDate}`);
+    const resAcct = responseAcct.data.map((codeItem: any) => { return {label: codeItem.acctNm, error: false, query: codeItem.acctCode}})
+    setAccount(resAcct)
   }
-  // console.log(form)
-
 
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -146,82 +231,93 @@ export const Fund = () => {
     }));
   };
 
-
-  // 입력값 변경
-  const handleInputChange = (field: string, value: any) => {
-    setForm((prevForm: any) => {
-      const keys = field.split(".");
-      let updatedForm = { ...prevForm };
-      let current: any = updatedForm;
-      keys.forEach((key: any, index) => {
-        // 배열 처리를 위한 검사
-        if (Array.isArray(current) && !isNaN(Number(key))) {
-          key = Number(key); // 인덱스를 숫자로 변환
-        }
-        if (index === keys.length - 1) {
-          current[key] = value; // 값 설정
-        } else {
-          current[key] = current[key] ? { ...current[key] } : {};
-          current = current[key];
-        }
-      });
-      return updatedForm;
-    });
-  };
-
   // 선택값 변경
   const handleSelectChange = (field: string, value: any) => {
-    setForm((prevForm: any) => {
-      const keys = field.split(".");
-      let updatedForm = { ...prevForm };
-      let current: any = updatedForm;
-      keys.forEach((key: any, index) => {
-        // 배열 처리를 위한 검사
-        if (Array.isArray(current) && !isNaN(Number(key))) {
-          key = Number(key); // 인덱스를 숫자로 변환
-        }
-        if (index === keys.length - 1) {
-          current[key] = value; // 값 설정
-        } else {
-          current[key] = current[key] ? { ...current[key] } : {};
-          current = current[key];
-        }
-      });
-      return updatedForm;
-    });
+    setForm((prevForm) => ({ ...prevForm, [field]: value }));
+    setErrors((prevErrors) => ({ ...prevErrors, [field]: false })); // Clear error on change
+  };
+  // const handleSelectChange = (field: string, value: any) => {
+  //   setForm((prevForm: any) => {
+  //     const keys = field.split(".");
+  //     let updatedForm = { ...prevForm };
+  //     let current: any = updatedForm;
+  //     keys.forEach((key: any, index) => {
+  //       // 배열 처리를 위한 검사
+  //       if (Array.isArray(current) && !isNaN(Number(key))) {
+  //         key = Number(key); // 인덱스를 숫자로 변환
+  //       }
+  //       if (index === keys.length - 1) {
+  //         current[key] = value; // 값 설정
+  //       } else {
+  //         current[key] = current[key] ? { ...current[key] } : {};
+  //         current = current[key];
+  //       }
+  //     });
+  //     return updatedForm;
+  //   });
+  // };
+
+
+
+  const validateForm = () => {
+    const newErrors = {
+      // certiCodeKind: !form.certiCodeKind, // 공통 필수값 검증
+      cncCode: !form.cncCode,
+      eventDate: !form.eventDate,
+      relCode: !form.relCode,
+      objNameHan: !form.objNameHan,
+    };
+    // 상태 업데이트
+    setErrors(newErrors);
+    // 오류가 없으면 true 반환
+    return Object.values(newErrors).every((error) => !error);
   };
 
 
   // 신청하기
-  const [openToast2, setOpenToast2] = useState<boolean>(false);
-  const [openToast3, setOpenToast3] = useState<boolean>(false);
+  const [openToast, setOpenToast] = useState({ message: "", type: "", open: false });
   const handleApply = async () => {
-    const formData = new URLSearchParams();
-    const appendFormData = (data: any, parentKey = '') => {
-      if (typeof data === 'object' && !Array.isArray(data)) {
-        Object.entries(data).forEach(([key, value]) => {
-          appendFormData(value, parentKey ? `${parentKey}.${key}` : key);
-        });
-      } else if (Array.isArray(data)) {
-        data.forEach((item, index) => {
-          appendFormData(item, `${parentKey}[${index}]`);
-        });
-      } else {
-        formData.append(parentKey, data);
+    if (!validateForm()) {
+      // setOpenToast({ message: "필수 값을 입력해주세요.", type: "danger", open: true });
+      return;
+    } else {
+      const formData = new URLSearchParams();
+      Object.entries(form).forEach(([key, value]) => {
+        formData.append(key, value);
+      });
+
+      try {
+        const response = await axiosInstance.post("/uhr/docappr/apprcn600", formData);
+        if (response.status === 200 && response.data) {
+          setOpenToast({ message: "결재요청이 완료되었습니다.", type: "success", open: true });
+          // navigate("/certificate/print");
+        } else {
+          setOpenToast({ message: "결재요청에 실패하였습니다.", type: "danger", open: true });
+        }
+      } catch (error: any) {
+        setOpenToast({ message: error.response?.data?.message || "오류가 발생하였습니다.", type: "danger", open: true });
       }
-    };  
-    appendFormData(form);
-    const { data } = await axiosInstance.post('/uhr/docappr/apprcn600', formData);
-  }
+    }
 
-
-
-  const handleReset = () => {
-    handleInputChange("shpayreq.reqAmt", 0);
-    handleSelectChange("resNoFamily", "");
-    handleSelectChange("shpayreq.relCode", "");
-    handleSelectChange("shpayreq.schoolKindCode", "");
-    handleSelectChange("shpayreq.schoolKindCode", "");
+    // const formData = new URLSearchParams();
+    // const appendFormData = (data: any, parentKey = '') => {
+    //   if (typeof data === 'object' && !Array.isArray(data)) {
+    //     Object.entries(data).forEach(([key, value]) => {
+    //       appendFormData(value, parentKey ? `${parentKey}.${key}` : key);
+    //     });
+    //   } else if (Array.isArray(data)) {
+    //     data.forEach((item, index) => {
+    //       appendFormData(item, `${parentKey}[${index}]`);
+    //     });
+    //   } else {
+    //     formData.append(parentKey, data);
+    //   }
+    // };  
+    // appendFormData(form);
+    // try {
+    //   const { data } = await axiosInstance.post('/uhr/docappr/apprcn600', formData);
+    // } catch {
+    // }
   }
 
   
@@ -232,39 +328,58 @@ export const Fund = () => {
       <div className="d-flex pt-10 pb-10 flex-direction-column">
         <UISelect
           label="경조사유"
-          items={[
-            { label: "선택", error: false, query: "" },
-            { label: "결혼", error: false, query: "01" },
-            { label: "회갑", error: false, query: "05" },
-            { label: "칠순", error: false, query: "06" },
-            { label: "사망", error: false, query: "07" },
-            { label: "출산(첫째)", error: false, query: "09" },
-            { label: "출산(둘째)", error: false, query: "10" },
-            { label: "출산(셋째이상)", error: false, query: "11" },
-            { label: "기타(기타 외부인)", error: false, query: "03" },
-          ]}
-          onQuerySelect={handleSelect}
+          items={welfareFundCodeDataTarget}
+          onQuerySelect={(value) => {
+            handleSelect(value);
+            handleSelectChange("cncCode", value);
+          }}
+          error={errors.cncCode}
+          hint={errors.cncCode ? "필수값입니다." : ""}
         />
       </div>
       <div className="d-flex pt-10 pb-10 flex-direction-column">
         <UIDatePicker
           label="경조발생일"
-          onDateSelect={(value) => handleSelectChange("eventDate", value.replace(/(\d{4})(\d{2})(\d{2})/g, '$1-$2-$3'))}
+          onDateSelect={(value) => handleSelectChange("eventDate", formatByType("date", value)) }
+          error={errors.eventDate}
+          hint={errors.eventDate ? "필수값입니다." : ""}
         />
       </div>
+      <div className="d-flex pt-10 pb-10 gap-10">
+        <div className="d-flex">
+          <UISelect
+            label="관계"
+            items={relation}
+            onQuerySelect={(value) => {
+              handleSelectRelation(value);
+              handleSelectChange("relCode", value);
+            }}
+            readOnly={form.eventDate === "" ? true : false}
+            error={errors.relCode}
+            hint={errors.relCode ? "필수값입니다." : ""}
+          />
+        </div>
+        <div className="d-flex align-items-end">
+          <UIInput
+            label="대상자"
+            placeholder="대상자 성명 기재"
+            onChange={(e) => handleSelectChange("objNameHan", e.target.value)}
+            error={errors.objNameHan}
+            hint={errors.objNameHan ? "필수값입니다." : ""}
+          />
+        </div>
+      </div>
       <div className="d-flex pt-10 pb-10 flex-direction-column">
-        <UISelect label="관계" items={relation} onQuerySelect={handleSelectRelation} />
+        <UISelect label="계정" items={account} readOnly={form.relCode === "" ? true : false} />
+      </div>
+      <div className="d-flex pt-10 pb-10 flex-direction-column">
+        <UIInput label="지급금액" readOnly placeholder={form.payAmt} />
       </div>
       <div className="d-flex pt-10 pb-10">
-        <UIInput label="비고" />
-      </div>
-      <div className="d-flex pt-10 pb-10 flex-direction-column">
-      {form.payAmt}
-        <UIInput label="지급금액" readOnly defaultValue={form.payAmt} />
+        <UIInput label="은행" readOnly placeholder={form.bankCd} />
       </div>
       <div className="d-flex pt-10 pb-10">
-      {form.leaveCnt}
-        <UIInput label="휴가일수" readOnly defaultValue={form.leaveCnt} />
+        <UIInput label="계좌정보" readOnly placeholder={form.acctNo} />
       </div>
 
 
@@ -277,7 +392,13 @@ export const Fund = () => {
             onChange={handleFileChange}
             multiple // multiple 속성 추가
           />
-          <UIInput label="첨부파일" placeholder="증빙서류첨부" disabled />
+          <UIInput
+            label="첨부파일"
+            placeholder="증빙서류첨부"
+            disabled
+            error={errors.atchFileId}
+            hint={errors.atchFileId ? "필수값입니다." : ""}
+          />
           <UIIconButton onClick={handleFileClick} className="is-file has-pressed-action" />
         </div>
         {selectedFiles && (
@@ -305,8 +426,7 @@ export const Fund = () => {
           <UIButton type="primary">결재요청</UIButton>
         </UIAlert>
       </div>
-      <UIToast message="신청이 완료되었습니다." type="success" open={openToast2} onOpenChange={setOpenToast2} />
-      <UIToast message="결재요청에 이상이 생겼습니다." type="danger" open={openToast3} onOpenChange={setOpenToast3} />
+      <UIToast message={openToast.message} type={openToast.type} open={openToast.open} onOpenChange={setOpenToast} />
     </>
   );
 };

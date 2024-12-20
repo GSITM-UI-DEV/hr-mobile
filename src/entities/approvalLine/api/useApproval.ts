@@ -16,7 +16,7 @@ export const useApprovalForm = () => {
 };
 
 const fetchApprovalLine = async (params: any): Promise<ApprovalLine[]> => {
-	const { data } = await axiosInstance.get(`/system/aprvlineset/default?formId=${params.formId}&emplNo=${params.emplNo}`);
+	const { data } = await axiosInstance.get(`/system/aprvlineset/default?formId=${params.formId}&emplNo=${params.emplNo}&recvEmplNo=${params.recvEmplNo}&ccCode=${params.ccCode}&cncCode=${params.cncCode}`);
 	return data;
 };
 export const useApprovalLine = (params: any) => {

@@ -18,15 +18,16 @@ export const useWelfare = () => {
 
 
 // 경조사 계좌 세팅
-const fetchFundBank = async (user: any): Promise<WelfareFund[]> => {
-	const { data } = await axiosInstance.get(`/uhr/docappr/apprcn600/userInfo?coCode=1000&emplNo=${user}`);
+const fetchFundBank = async (params: any): Promise<WelfareFund> => {
+	const { data } = await axiosInstance.get(`/uhr/docappr/apprcn600/userInfo?coCode=${params.coCode}&emplNo=${params.emplNo}`);
 	return data;
 };
-export const useFundBank = (user: any) => {
-	return useQuery<WelfareFund[], Error>({
-		queryKey: ['fetchFundBank'],
-		queryFn: () => fetchFundBank(user),
-		initialData: [],
+export const useFundBank = (params: any) => {
+	return useQuery<WelfareFund, Error>({
+		queryKey: ['fetchFundBank', params],
+		queryFn: () => fetchFundBank(params),
+		initialData: Object,
+		enabled: !!params.coCode && !!params.emplNo
 	});
 };
 // 경조사 문서번호 세팅

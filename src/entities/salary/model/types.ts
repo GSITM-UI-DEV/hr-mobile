@@ -56,7 +56,7 @@ interface PrrtappropDcList {
   payAmt: string,
 }
 
-interface prrtappropDbList {
+interface PrrtappropDbList {
   workPeriod: string,
   effDateYm: string,
   payAmt: string,
@@ -64,5 +64,5 @@ interface prrtappropDbList {
 export interface SalarySeverance {
   loginUserNm: string;
   prrtappropDcList: PrrtappropDcList[];
-  prrtappropDbList: prrtappropDbList[];
+  prrtappropDbList: PrrtappropDbList[];
 }

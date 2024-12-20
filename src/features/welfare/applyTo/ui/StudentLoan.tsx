@@ -1,4 +1,5 @@
 import { axiosInstance } from "@/app/api/axiosInstance";
+import { useBaseCode } from "@/entities/approvalLine";
 import { useStudentLoan } from "@/entities/welfare/api/useWelfare";
 import { UIAlert, UIButton, UIDatePicker, UIIconButton, UIInput, UISelect, UIToast } from "@/shared/ui";
 import { useRef, useState } from "react";
@@ -6,14 +7,6 @@ import { useNavigate } from "react-router-dom";
 
 
 export const StudentLoan = () => {
-  const navigate = useNavigate();
-  
-  const { data, isLoading, error } = useStudentLoan();
-  if (isLoading) return <p>Loading...</p>;
-  if (error) return <p>Something went wrong!</p>;
-  const studentTarget = data.map((item) => { return {label: item.familyNameHan, error: false, query: {qs1: item.resNoFamily, qs2: item.relCode}} })
-  
-
   const getToday = () => {
     const today = new Date();
     const month = today.getMonth() + 1;
@@ -21,8 +14,6 @@ export const StudentLoan = () => {
     const date = today.getDate();
     return `${year}${month}${date}`;
   }
-
-
   const [form, setForm] = useState({
     reqSeqNo: '1', // 모바일은 저장 단계없이 바로 신청
     reqDate: getToday(),
@@ -50,6 +41,84 @@ export const StudentLoan = () => {
       }
     ]
   });
+
+
+
+  const [errors, setErrors] = useState<Record<string, boolean | object>>({
+    reqSeqNo: false,
+    reqDate: false,
+    payDate: false,
+    resNoFamily: false,
+    atchFileId: false,
+    shpayreq: {
+      schoolCodeInd: false,
+      schoolKindCode: false,
+      semesterCode: false,
+      schoolNameHan: false,
+      relCode: false,
+      reqAmt: false,
+      payAmt: false,
+      schYear: false,
+      reqCnt: false,
+    },
+  }); // 에러 메시지 관리
+
+
+
+
+
+
+  const navigate = useNavigate();
+  const { data, isLoading, error } = useStudentLoan();
+  if (isLoading) return <p>Loading...</p>;
+  if (error) return <p>Something went wrong!</p>;
+  const studentTarget = data.map((item) => { return {label: item.familyNameHan, error: false, query: {qs1: item.resNoFamily, qs2: item.relCode}} })
+
+  const parameters = {
+    baseCodList: [
+      { "patternCode": "PS22", "effDateYn": true, "companyYn": true },
+      { "patternCode": "SH04", "effDateYn": true, "companyYn": true },
+      { "patternCode": "SH02", "effDateYn": true, "companyYn": true },
+      { "patternCode": "SH03", "effDateYn": true, "companyYn": true, "etc1Value": "Y" },
+      { "patternCode": "SH17", "effDateYn": true, "companyYn": true },
+      { "patternCode": "SH15", "effDateYn": true, "companyYn": true },
+      { "patternCode": "SH08", "effDateYn": true, "companyYn": true },
+      { "patternCode": "SH18", "effDateYn": true, "companyYn": true },
+      { "patternCode": "SH24", "effDateYn": true, "companyYn": true },
+      { "patternCode": "SH03", "effDateYn": true, "companyYn": true, "etc1Value": "Y" },
+      { "patternCode": "SH04", "effDateYn": true, "companyYn": true, "etc3Value": "Y" },
+      { "patternCode": "SH08", "effDateYn": true, "companyYn": true, "etc1Value": "Y" },
+      { "patternCode": "SH24", "effDateYn": true, "companyYn": true, "etc1Value": "Y" },
+      { "patternCode": "SH04", "effDateYn": true, "companyYn": true, "etc1Value": "U" },
+      { "patternCode": "SH05", "effDateYn": true, "companyYn": true },
+      { "patternCode": "SH03", "effDateYn": true, "companyYn": true, "etc4Value": "Y" },
+      { "patternCode": "SH03", "effDateYn": true, "companyYn": true, "etc1Value": "Y" },
+      { "patternCode": "SH03", "effDateYn": true, "companyYn": true }
+    ]
+  }
+  const { data: baseCodeData, isLoading: isBaseCodeLoading, error: baseCodeError } = useBaseCode(parameters);
+	if (isBaseCodeLoading) return <p>Loading...</p>;
+	if (baseCodeError) return <p>Something went wrong!</p>;
+  const codeData = baseCodeData && baseCodeData.map((code: any, index) =>
+    code.cdbaseList.map((cd: any) => (
+      {codeKey : cd.baseCode, codeName: cd.codeNameHan}
+    ))
+  )
+
+  console.log(codeData[9]);
+  console.log(codeData[14]);
+
+
+
+
+
+  
+  
+
+  
+
+
+
 
   const [fileField, setFileField] = useState<boolean>(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -108,6 +177,10 @@ export const StudentLoan = () => {
       return updatedForm;
     });
   };
+
+
+
+
   // 선택값 변경
   const handleSelectChange = (field: string, value: any) => {
     setForm((prevForm: any) => {
@@ -132,50 +205,63 @@ export const StudentLoan = () => {
 
 
 
-
-
-  // 신청하기 & 초기화하기
-  const [openToast2, setOpenToast2] = useState<boolean>(false);
-  const [openToast3, setOpenToast3] = useState<boolean>(false);
-  const handleApply = async () => {
-    const formData = new URLSearchParams();
-    const appendFormData = (data: any, parentKey = '') => {
-      if (typeof data === 'object' && !Array.isArray(data)) {
-        Object.entries(data).forEach(([key, value]) => {
-          appendFormData(value, parentKey ? `${parentKey}.${key}` : key);
-        });
-      } else if (Array.isArray(data)) {
-        data.forEach((item, index) => {
-          appendFormData(item, `${parentKey}[${index}]`);
-        });
-      } else {
-        formData.append(parentKey, data);
+  const validateForm = () => {
+    const newErrors = {
+      // certiCodeKind: !form.certiCodeKind, // 공통 필수값 검증
+      resNoFamily: !form.resNoFamily,
+      shpayreq: {
+        relCode: !form.shpayreq.relCode,
+        schoolKindCode: !form.shpayreq.schoolKindCode,
+        reqAmt: !form.shpayreq.reqAmt,
+        payAmt: !form.shpayreq.payAmt,
+        schoolCodeInd: !form.shpayreq.schoolCodeInd,
+        schoolNameHan: !form.shpayreq.schoolNameHan,
+        semesterCode: !form.shpayreq.semesterCode,
       }
-    };  
-    appendFormData(form);
-    const { data } = await axiosInstance.post('/wlf/wlfstuapply/wlfstuapply111/req', formData)
-    if (data === 1) {
-      setOpenToast2(true);
-      setTimeout(() => {
-        navigate('/welfare')
-      }, 1000)
-    } else {
-      setOpenToast3(true);
-    }
-  }
+    };
+    // 상태 업데이트
+    setErrors(newErrors);
+    // 오류가 없으면 true 반환
+    return Object.values(newErrors).every((error) => !error);
+  };
 
-  const handleReset = () => {
-    handleSelectChange("resNoFamily", "");
-    handleSelectChange("shpayreq.relCode", "");
-    handleSelectChange("shpayreq.schoolKindCode", "");
-    handleInputChange("shpayreq.reqAmt", 0);
-    handleSelectChange("shpayreq.schoolCodeInd", "");
-    handleInputChange("shpayreq.schoolNameHan", "");
-    handleInputChange("shpayreq.schYear", "");
-    handleSelectChange("shpayreq.semesterCode", "");
-    handleInputChange("shpayreq.reqAmt", 0);
-    handleSelectChange("payDate", "")
-    setSelectedFiles(null);
+  // 신청하기
+  const [openToast, setOpenToast] = useState({ message: "", type: "", open: false });
+  const handleApply = async () => {
+    if (!validateForm()) {
+      // setOpenToast({ message: "필수 값을 입력해주세요.", type: "danger", open: true });
+      return;
+    } else {
+      const formData = new URLSearchParams();
+      const appendFormData = (data: any, parentKey = '') => {
+        if (typeof data === 'object' && !Array.isArray(data)) {
+          Object.entries(data).forEach(([key, value]) => {
+            appendFormData(value, parentKey ? `${parentKey}.${key}` : key);
+          });
+        } else if (Array.isArray(data)) {
+          data.forEach((item, index) => {
+            appendFormData(item, `${parentKey}[${index}]`);
+          });
+        } else {
+          formData.append(parentKey, data);
+        }
+      };
+      appendFormData(form);
+      try {
+        const { data } = await axiosInstance.post('/wlf/wlfstuapply/wlfstuapply111/req', formData);
+        if (data > 0) {
+          setOpenToast({message: "결재요청이 완료되었습니다.", open: true, type: "success"});
+          setTimeout(() => {
+            setOpenToast((prev) => ({ ...prev, open: false }));
+            navigate('/welfare')
+          }, 1000);
+        } else {
+          setOpenToast({message: "결재요청에 이상이 있습니다.", open: true, type: "danger"});
+        }
+      } catch (error: any) {
+        setOpenToast({message: error.response.data.message, open: true, type: "danger"});
+      }
+    }
   }
 
   
@@ -189,6 +275,8 @@ export const StudentLoan = () => {
             handleSelectChange("resNoFamily", value.qs1);
             handleSelectChange("shpayreq.relCode", value.qs2);
           }}
+          // error={errors.resNoFamily}
+          // hint={errors.resNoFamily ? "필수값입니다." : ""}
         />
       </div>
       <div className="pt-10 pb-10">
@@ -201,23 +289,34 @@ export const StudentLoan = () => {
             handleInputChange("shpayreq.reqAmt", 300000)
             handleInputChange("shpayreq.payAmt", 300000)
           }}
+          // error={errors.shpayreq.schoolKindCode}
+          // hint={errors.shpayreq.schoolKindCode ? "필수값입니다." : ""}
         />
       </div>
       <div className="pt-10 pb-10">
-        <UISelect label="학교구분" items={
-          form.shpayreq.schoolKindCode === 'EN' ?
-            [
+        {form.shpayreq.schoolKindCode === 'EN' ?
+          <UISelect
+            label="학교구분"
+            items={[
               {label: "유치원", error: false, query: "CS"},
               {label: "초등학교", error: false, query: "ES"},
               {label: "중학교", error: false, query: "MS"},
               {label: "고등학교", error: false, query: "HS"}
-            ]
-          :
-            [
+            ]}
+            onQuerySelect={(value) => handleSelectChange("shpayreq.schoolCodeInd", value)}
+            // error={errors.eventDate}
+            // hint={errors.eventDate ? "필수값입니다." : ""}
+          />
+        :
+          <UISelect
+            label="학교구분"
+            items={[
               {label: "고등학교", error: false, query: "HS"},
               {label: "대학교", error: false, query: "US"},
-            ]
-        } onQuerySelect={(value) => handleSelectChange("shpayreq.schoolCodeInd", value)} />
+            ]}
+            onQuerySelect={(value) => handleSelectChange("shpayreq.schoolCodeInd", value)}
+          />
+        }
       </div>
       {form.shpayreq.schoolKindCode === 'ED' &&
         <>
@@ -294,8 +393,7 @@ export const StudentLoan = () => {
           <UIButton type="primary">결재요청</UIButton>
         </UIAlert>
       </div>
-      <UIToast message="신청이 완료되었습니다." type="success" open={openToast2} onOpenChange={setOpenToast2} />
-      <UIToast message="결재요청에 이상이 있습니다." type="danger" open={openToast3} onOpenChange={setOpenToast3} />
+      <UIToast message={openToast.message} type={openToast.type} open={openToast.open} onOpenChange={setOpenToast} />
     </>
   )
 }

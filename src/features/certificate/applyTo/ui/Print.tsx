@@ -96,10 +96,10 @@ export const Print = () => {
         sysCoNm: printTarget[0].loginCoNm,
         sysCoEngNm: printTarget[0].loginCoNm,
         // 환경 변수 처리 할 것
-        // rptProfile: "dev",
-        rptProfile: "prod",
-        // imgUrl: "http://10.141.5.197:8110/",
-        imgUrl: "https://hrmreport.dbhitek.com/",
+        rptProfile: "dev",
+        // rptProfile: "prod",
+        imgUrl: "http://10.141.5.197:8110/",
+        // imgUrl: "https://hrmreport.dbhitek.com/",
         dataset_2: encodeURIComponent(JSON.stringify([{
           resNo: printTarget[0].resNo,
           // birth: printTarget[0].resNo.split("-")[0].replace(/(\d{2})(\d{2})(\d{2})/, "$1.$2.$3")
@@ -113,8 +113,8 @@ export const Print = () => {
       // Create a form dynamically
       const printForm = document.createElement("form");
       printForm.setAttribute("method", "POST");
-      // printForm.setAttribute("action", "http://10.141.5.197:8120/UView5/index.jsp");
-      printForm.setAttribute("action", "https://hrmreport.dbhitek.com/UView5/index.jsp");
+      printForm.setAttribute("action", "http://10.141.5.197:8120/UView5/index.jsp");
+      // printForm.setAttribute("action", "https://hrmreport.dbhitek.com/UView5/index.jsp");
       printForm.setAttribute("target", "_blank"); // Open in a new tab or window
     
       // Append hidden inputs for each form data field

@@ -111,8 +111,6 @@ export const Issue = () => {
         setOpenToast({ message: error.response?.data?.message || "오류가 발생하였습니다.", type: "danger", open: true });
       }
     }
-
-    
   };
 
   const getYearRange = (start: number, end: number) => {

@@ -6,9 +6,7 @@ export type {
 } from './model/types';
 
 export {
-	applyFund,
-	applyInsurance,
-	applyStudentLoan
-} from './api/applyWelfare';
-
-export { ApplyAction } from './ui/ApplyAction';
+	useFundBank,
+	useStudentLoan,
+	useInsurance
+} from './api/useWelfare';

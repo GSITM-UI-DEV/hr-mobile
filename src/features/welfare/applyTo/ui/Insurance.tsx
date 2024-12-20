@@ -72,11 +72,7 @@ export const Insurance = () => {
 
 
   // 보험 신청(+결과값 Toast 알림)
-  const [openToast, setOpenToast] = useState({
-    message: "",
-    type: "",
-    open: false
-  });
+  const [openToast, setOpenToast] = useState({ message: "", type: "", open: false });
   const handleApply = async () => {
     const formData = new URLSearchParams();
     const appendFormData = (data: any, parentKey = '') => {
