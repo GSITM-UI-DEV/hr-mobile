@@ -8,7 +8,7 @@ import { Outlet, useParams } from "react-router-dom";
 export const TenureLeaveFlowPage = () => {
 	const detail = useParams();
 	const [rtflowId, reqDate, emplNo, lastWorkDate] = detail.id ? detail.id.split("-") : '';
-	const queryString = `rtflowId=${rtflowId}&reqDate=${reqDate}&emplNo=${emplNo}&workName=${lastWorkDate}`;
+	const queryString = `rtflowId=${rtflowId}&reqDate=${reqDate}&emplNo=${emplNo}&lastWorkDate=${lastWorkDate}`;
 
 	return (
 		<>

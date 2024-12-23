@@ -91,8 +91,36 @@ export interface TenureLeaveFlow {
 }
 
 
-
 export interface TenureLeaveDetail {
   name: string,
-  type: string
+  type: string,
+  info: string,
+}
+
+
+export interface TenureLeaveSurvey {
+  ans1: string,
+  ans2: string,
+  ans3: string,
+  ans4: string,
+  ans5: string,
+  ans6: string,
+  ans7: string,
+  ans8: string,
+  ans9: string,
+  ans10: string,
+  ans11: string,
+  ans12: string,
+  ans13: string,
+  ans14: string,
+  ans15: string,
+  ans16: string,
+  ans17: string,
+  ans18: string,
+  ans19: string,
+  ans20: string,
+  emplNo: string,
+  surveyNo: string,
+  retireReqDate: string,
+  coCode: string,
 }

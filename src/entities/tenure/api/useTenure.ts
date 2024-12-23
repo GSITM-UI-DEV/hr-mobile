@@ -1,6 +1,6 @@
 import { axiosInstance } from "@/app/api/axiosInstance";
 import { useQuery } from "@tanstack/react-query";
-import { TenureLeaveDetail, TenureLeaveFlow } from "..";
+import { TenureLeaveDetail, TenureLeaveFlow, TenureLeaveSurvey } from "..";
 
 
 
@@ -14,7 +14,7 @@ export const useTenureLeaveFlow = (params: any) => {
 		queryKey: ['TenureLeaveFlow', params],
 		queryFn: () => fetchTenureLeaveFlow(params),
 		initialData: [],
-		enabled: !!params.fromDate
+		enabled: !!params.fromDate && !!params.rEmplNo && !!params.rEmplNameHan
 	});
 };
 
@@ -29,5 +29,19 @@ export const useTenureLeaveDetail = (params: any) => {
 		queryFn: () => fetchTenureLeaveDetail(params),
 		initialData: [],
 		enabled: !!params
+	});
+};
+
+// 퇴직Flow처리
+const fetchTenureLeaveSurvey = async (params: any): Promise<TenureLeaveSurvey[]> => {
+	const { data } = await axiosInstance.get(`/emp/dbhemprt/emprt140/pop01?emplNo=${params.emplNo}&retireReqDate=${params.retireReqDate}&rtflowId=${params.rtflowId}`);
+	return data;
+};
+export const useTenureLeaveSurvey = (params: any) => {
+	return useQuery<TenureLeaveSurvey[], Error>({
+		queryKey: ['TenureLeaveSurvey', params],
+		queryFn: () => fetchTenureLeaveSurvey(params),
+		initialData: [],
+		enabled: !!params.emplNo && !! params.retireReqDate && !!params.rtflowId
 	});
 };

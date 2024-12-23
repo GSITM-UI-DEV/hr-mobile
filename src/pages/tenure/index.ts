@@ -6,5 +6,5 @@ export { TenureJoinApplyPage } from './ui/TenureJoinApplyPage';
 export { TenureJoinInfoPage } from './ui/TenureJoinInfoPage';
 export { TenureLeaveFlowPage } from './ui/TenureLeaveFlowPage';
 export { TenureLeaveResignationPage } from './ui/TenureLeaveResignationPage';
-export { TenureLeaveSecurityPage } from './ui/TenureLeaveSecurityPage';
+export { TenureLeaveHandOverPage } from './ui/TenureLeaveHandOverPage';
 export { TenureLeaveSurveyPage } from './ui/TenureLeaveSurveyPage';

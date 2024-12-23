@@ -4,15 +4,16 @@ import { WelfareFund, WelfareInsurance, WelfareStatus, WelfareStudentLoan } from
 
 
 // 복리후생 전체 조회
-const fetchWelfare = async (): Promise<WelfareStatus[]> => {
-	const { data } = await axiosInstance.get("/wlf/welfaremng/welfaremng200?emplNo=10006254&yyMM=202410");
+const fetchWelfare = async (params: any): Promise<WelfareStatus[]> => {
+	const { data } = await axiosInstance.get(`/wlf/welfaremng/welfaremng100/findwelfaremobile?emplNo=${params.emplNo}&yyyyMm=${params.yyyyMm}&loginCoId=${params.loginCoId}`);
 	return data;
 };
-export const useWelfare = () => {
+export const useWelfare = (params: any) => {
 	return useQuery<WelfareStatus[], Error>({
-		queryKey: ['WelfareStatus'],
-		queryFn: fetchWelfare,
+		queryKey: ['WelfareStatus', params],
+		queryFn: () => fetchWelfare(params),
 		initialData: [],
+		enabled: !!params.emplNo && !!params.yyyyMm && !!params.loginCoId
 	});
 };
 

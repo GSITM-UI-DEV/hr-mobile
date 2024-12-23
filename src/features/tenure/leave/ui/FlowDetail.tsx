@@ -2,32 +2,37 @@ import { axiosInstance } from "@/app/api/axiosInstance";
 import { useTenureLeaveDetail } from "@/entities/tenure";
 import { formatByType } from "@/shared/lib/formatByType";
 import { UIAlert, UIButton, UICheckbox, UIDatePicker, UIIconButton, UIInput, UISelect, UIText, UIToast } from "@/shared/ui";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useOutletContext } from "react-router-dom";
 
 export const FlowDetail = () => {
-  const [form, setForm] = useState({
-    host1Val: "",
-    rtflowId: "",
-    atchFileId: "",
-    emplNo: "",
-    retireReqDate: "",
-  });
-  const [errors, setErrors] = useState({
-    certiCodeKind: false,
-  });
   const [openToast, setOpenToast] = useState({ message: "", type: "", open: false });
-  
+  const [form, setForm] = useState<Record<string, any>>({}); // 필드를 동적으로 받을 수 있도록 초기 상태 빈 객체
+  const [errors, setErrors] = useState<Record<string, boolean>>({}); // 에러 메시지 관리
 
   const qs: string = useOutletContext();
   const params = new URLSearchParams(qs);
   const { data: tenureLeaveDetailData, isLoading: isTenureLeaveDetailLoading, error: tenureLeaveDetailError } = useTenureLeaveDetail(qs);
 	if (isTenureLeaveDetailLoading) return <p>Loading...</p>;
 	if (tenureLeaveDetailError) return <p>Error: {tenureLeaveDetailError.message}</p>;
-  // console.log(tenureLeaveDetailData);
+  
+  useEffect(() => {
+    const dynamicForm = tenureLeaveDetailData.reduce((acc: Record<string, any>, field: any, index: number) => {
+      if (["TEXT", "COMBO", "DATE", "CHECK", "NUMBER"].includes(field.type)) {
+        acc[`host${index + 1}Val`] = "";
+      }
+      return acc;
+    }, {});
 
-
-
+    setForm(dynamicForm)
+    setForm((prev) => ({
+      ...prev,
+      atchFileId: "",
+      emplNo: params.get("emplNo"),
+      rtflowId: params.get("rtflowId"),
+      retireReqDate: params.get("lastWorkDate"),
+    }))
+  }, [params])
 
 
   const [fileField, setFileField] = useState<boolean>(false);
@@ -50,7 +55,6 @@ export const FlowDetail = () => {
       }));
     }
   };
-
   const handleFileRemove = (indexToRemove: number) => {
     if (selectedFiles) {
       const updatedFilesArray = Array.from(selectedFiles).filter((_, index) => index !== indexToRemove);
@@ -66,55 +70,69 @@ export const FlowDetail = () => {
   };
 
 
-  const validateForm = () => {
-    const newErrors = {
-      certiCodeKind: true // 공통 필수값 검증
-    };
-    setErrors(newErrors);
-    return Object.values(newErrors).every((error) => !error);
+  // const handleSelectChange = (field: string, value: any) => {
+  //   setForm((prevForm: any) => {
+  //     const keys = field.split(".");
+  //     let updatedForm = { ...prevForm };
+  //     let current: any = updatedForm;
+  //     keys.forEach((key: any, index) => {
+  //       // 배열 처리를 위한 검사
+  //       if (Array.isArray(current) && !isNaN(Number(key))) {
+  //         key = Number(key); // 인덱스를 숫자로 변환
+  //       }
+  //       if (index === keys.length - 1) {
+  //         current[key] = value; // 값 설정
+  //       } else {
+  //         current[key] = current[key] ? { ...current[key] } : {};
+  //         current = current[key];
+  //       }
+  //     });
+  //     return updatedForm;
+  //   });
+  // };
+  const handleSelectChange = (field: string, value: any) => {
+    setForm((prevForm) => ({
+      ...prevForm,
+      [field]: value,
+    }));
+    setErrors((prevErrors) => ({
+      ...prevErrors,
+      [field]: false, // 값이 변경되면 에러 해제
+    }));
   };
 
   const handleApply = async () => {
-    if (!validateForm()) {
-      // setOpenToast({ message: "필수 값을 입력해주세요.", type: "danger", open: true });
-      return;
-    } else {
-      const formData = new URLSearchParams();
-      Object.entries(form).forEach(([key, value]) => {
-        formData.append(key, value);
-      });
-      try {
-        const response = await axiosInstance.post("/emp/dbhemprt/emprt140", formData);
-        if (response.status === 200 && response.data) {
-          setOpenToast({ message: "결재요청이 완료되었습니다.", type: "success", open: true });
-        } else {
-          setOpenToast({ message: "결재요청에 실패하였습니다.", type: "danger", open: true });
-        }
-      } catch (error: any) {
-        setOpenToast({ message: error.response?.data?.message || "오류가 발생하였습니다.", type: "danger", open: true });
+    const formData = new URLSearchParams();
+    let hasError = false;
+    // 에러를 무시할 필드 목록
+    const ignoredEmptyFields = ["atchFileId", "host1Val"];
+    Object.entries(form).forEach(([key, value]) => {
+      if (!value && !ignoredEmptyFields.includes(key)) {
+        hasError = true; // 에러 플래그 설정
+        setErrors((prevErrors) => ({
+          ...prevErrors,
+          [key]: true, // 에러 상태 업데이트
+        }));
+      } else {
+        formData.append(key, String(value)); // 값이 있을 때만 추가
       }
-    }
-  };
-
-  const handleSelectChange = (field: string, value: any) => {
-    setForm((prevForm: any) => {
-      const keys = field.split(".");
-      let updatedForm = { ...prevForm };
-      let current: any = updatedForm;
-      keys.forEach((key: any, index) => {
-        // 배열 처리를 위한 검사
-        if (Array.isArray(current) && !isNaN(Number(key))) {
-          key = Number(key); // 인덱스를 숫자로 변환
-        }
-        if (index === keys.length - 1) {
-          current[key] = value; // 값 설정
-        } else {
-          current[key] = current[key] ? { ...current[key] } : {};
-          current = current[key];
-        }
-      });
-      return updatedForm;
     });
+    // 에러가 있으면 서버 요청을 중단
+    if (hasError) {
+      return;
+    }
+    
+    console.log(formData)
+    try {
+      const response = await axiosInstance.post("/emp/dbhemprt/emprt140", formData);
+      if (response.status === 200 && response.data) {
+        setOpenToast({ message: "결재요청이 완료되었습니다.", type: "success", open: true });
+      } else {
+        setOpenToast({ message: "결재요청에 실패하였습니다.", type: "danger", open: true });
+      }
+    } catch (error: any) {
+      setOpenToast({ message: error.response?.data?.message || "오류가 발생하였습니다.", type: "danger", open: true });
+    }
   };
 
 
@@ -125,12 +143,18 @@ export const FlowDetail = () => {
         <div className="pt-10 pb-10" key={index}>
           {item.name === "HOST_NOTE" ?
             <div className="fs-16 text-point-1">{item.type}</div>
+          : item.type === "INFO" ?
+            <UIInput
+              label={item.name}
+              placeholder={item.info}
+              readOnly
+            />
           : item.type === "TEXT" ?
             <UIInput
               label={item.name}
               onChange={(e) => handleSelectChange(`host${index + 1}Val`, e.target.value)}
-              error={true}
-              hint={true ? "필수값입니다." : ""}
+              error={!!errors[`host${index + 1}Val`]}
+              hint={errors[`host${index + 1}Val`] ? "필수값입니다." : ""}
             />
           : item.type === "COMBO" ?
             <UISelect
@@ -140,26 +164,31 @@ export const FlowDetail = () => {
                 {label: "부", error: false, query: "A1912"}
               ]}
               onQuerySelect={(data) => handleSelectChange(`host${index + 1}Val`, data)}
-              error={true}
-              hint={true ? "필수값입니다." : ""}
+              error={!!errors[`host${index + 1}Val`]}
+              hint={errors[`host${index + 1}Val`] ? "필수값입니다." : ""}
             />
           : item.type === "DATE" ?
             <UIDatePicker
               label={item.name}
               onDateSelect={(data) => handleSelectChange(`host${index + 1}Val`, formatByType("date", data))}
-              error={true}
-              hint={true ? "필수값입니다." : ""}
+              error={!!errors[`host${index + 1}Val`]}
+              hint={errors[`host${index + 1}Val`] ? "필수값입니다." : ""}
             />
           : item.type === "CHECK" ?
             <UICheckbox
               label={item.name}
+              // onChecked={() => handleSelectChange(`host${index + 1}Val`, "Y")}
+              onChange={(e) => {
+                const checked = e.target.checked; // 체크 여부 가져오기
+                handleSelectChange(`host${index + 1}Val`, checked ? "Y" : "N");
+              }}
             />
           : item.type === "NUMBER" ?
             <UIInput
               label={item.name}
               type="number"
-              error={true}
-              hint={true ? "필수값입니다." : ""}
+              error={!!errors[`host${index + 1}Val`]}
+              hint={errors[`host${index + 1}Val`] ? "필수값입니다." : ""}
             />
           : item.type === "Y" && item.name === "ATTACH_IND" ?
             <>

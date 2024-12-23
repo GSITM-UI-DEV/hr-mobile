@@ -51,6 +51,7 @@ import {
 	TenureJoinApplyPage,
 	TenureJoinInfoPage,
 	TenureLeaveFlowPage,
+	TenureLeaveHandOverPage,
 	TenureLeaveResignationPage,
 	TenureLeaveSurveyPage,
 	TenurePage
@@ -162,6 +163,7 @@ createRoot(document.getElementById("root")!).render(
 							<Route path=":id" element={<FlowDetail />} />
 						</Route>
 						<Route path="/tenure/leave-resignation/:id" element={<TenureLeaveResignationPage />} />
+						<Route path="/tenure/leave-handover/:id" element={<TenureLeaveHandOverPage />} />
 						<Route path="/tenure/leave-survey/:id" element={<TenureLeaveSurveyPage />} />
 
 

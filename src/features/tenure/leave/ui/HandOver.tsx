@@ -1,29 +1,30 @@
 import { axiosInstance } from "@/app/api/axiosInstance";
 import { useApprovalDocument, useApprovalForm, useApprovalLine } from "@/entities/approvalLine";
 import { useUser } from "@/entities/user";
-import { UIAlert, UIButton, UICheckbox, UIInput, UITextarea, UIToast } from "@/shared/ui"
+import { UIAlert, UIButton, UIInput, UITextarea, UIToast } from "@/shared/ui";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-export const Resignation = () => {
+
+export const HandOver = () => {
   const navigate = useNavigate();
   const [form, setForm] = useState({
-    chargeJob: "",
-    detailReason: "",
-    telNo: "",
-    docNo: "",
-    mblPgmId: "",
+    transferReason: "",
+    transferNote1: "",
+    transferNote2: "",
+    transferNote3: "",
+    transferNote4: "",
+    recvEmplNo: "00000115",
+    recvEmplNameHan: "장순욱",
     statusCode: "1",
-    // saveFlag: "Y",
-    // emlpNo: "10006254",
-    // emplNameHan: "노태규",
-    // entranceDate: "2021-09-01",
-    // workPeriod: "3년3개월22일",
-    // address: "인천광역시 서구 한들로 73-0 (백석동, 검암역로열파크씨티푸르지오2단지) 208동 1303호",
   });
+
   const [errors, setErrors] = useState({
-    chargeJob: false,
-    detailReason: false
+    transferReason: false,
+    transferNote1: false,
+    transferNote2: false,
+    transferNote3: false,
+    transferNote4: false,
   });
   const [openToast, setOpenToast] = useState({ message: "", type: "", open: false });
 
@@ -39,7 +40,7 @@ export const Resignation = () => {
   const { data: approvalFormData, isLoading: isApprovalFormLoading, error: approvalFormError } = useApprovalForm();
   if (isApprovalFormLoading) return <p>Loading...</p>;
   if (approvalFormError) return <p>Something went wrong!</p>;
-  const selectedForm = approvalFormData?.filter((i) => i.formId === "RT")[0] // 퇴직사직원(코드)
+  const selectedForm = approvalFormData?.filter((i) => i.formId === "TS")[0] // 인수인계서(코드)
   
   const { data: approvalLineData, isLoading: isApprovalLineLoading, error: approvalLineError } = useApprovalLine({
     formId: selectedForm?.formId,
@@ -56,14 +57,9 @@ export const Resignation = () => {
     // 결재 라인-기안서 세팅
     setForm((prev) => ({
       ...prev,
-      chk1: "",
-      chk2: "",
-      chk3: "",
-      chk4: "",
-      chk5: "",
-      chk6: "",
-      chk7: "",
-      chk8: "",
+
+
+
       docNo: approvalDocumentData,
       docTitlNm: `${selectedForm?.formName}-${userData.loginUserNm}`,
       formId: selectedForm?.formId,
@@ -86,10 +82,25 @@ export const Resignation = () => {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
   const validateForm = () => {
     const newErrors = {
-      chargeJob: !form.chargeJob,
-      detailReason: !form.detailReason
+      transferReason: !form.transferReason,
+      transferNote1: !form.transferNote1,
+      transferNote2: !form.transferNote2,
+      transferNote3: !form.transferNote3,
+      transferNote4: !form.transferNote4,
     };
     setErrors(newErrors);
     return Object.values(newErrors).every((error) => !error);
@@ -116,7 +127,7 @@ export const Resignation = () => {
       };
       appendFormData(form);
       try {
-        const response = await axiosInstance.post("/emp/dbhemprt/emprt150", formData);
+        const response = await axiosInstance.post("/emp/dbhemprt/emprt170", formData);
         if (response.status === 200 && response.data) {
           setOpenToast({message: "임시저장이 완료되었습니다.", open: true, type: "success"});
           setTimeout(() => {
@@ -185,80 +196,56 @@ export const Resignation = () => {
     setErrors((prevErrors) => ({ ...prevErrors, [field]: false })); // Clear error on change
   };
   
+
   return (
     <>
       <div className="pt-10 pb-10">
         <UIInput
-          label="담당업무"
-          onChange={(e) => handleSelectChange("chargeJob", e.target.value)}
-          error={errors.chargeJob}
-          hint={errors.chargeJob ? "필수값입니다." : ""}
+          label="인계사유"
+          onChange={(e) => handleSelectChange("transferReason", e.target.value)}
+          error={errors.transferReason}
+          hint={errors.transferReason ? "필수값입니다." : ""}
           readOnly={fieldDisable}
         />
-      </div>
-      <div className="pt-10 pb-10">
-        <div className="checkbox__list">
-          <UICheckbox
-            label="처우"
-            value="chk1"
-            onChecked={(chk) => handleSelectChange("chk1", chk ? "1" : "")}
-            disabled={fieldDisable}
-          />
-          <UICheckbox
-            label="직무/조직"
-            value="chk2"
-            onChecked={(chk) => handleSelectChange("chk2", chk ? "2" : "")}
-            disabled={fieldDisable}
-          />
-          <UICheckbox
-            label="인간관계"
-            value="chk3"
-            onChecked={(chk) => handleSelectChange("chk3", chk ? "3" : "")}
-            disabled={fieldDisable}
-          />
-          <UICheckbox
-            label="자기계발"
-            value="chk4"
-            onChecked={(chk) => handleSelectChange("chk4", chk ? "4" : "")}
-            disabled={fieldDisable}
-          />
-          <UICheckbox
-            label="개인사정"
-            value="chk5"
-            onChecked={(chk) => handleSelectChange("chk5", chk ? "5" : "")}
-            disabled={fieldDisable}
-          />
-          <UICheckbox
-            label="계약종료"
-            value="chk6"
-            onChecked={(chk) => handleSelectChange("chk6", chk ? "6" : "")}
-            disabled={fieldDisable}
-          />
-          <UICheckbox
-            label="승진누락"
-            value="chk7"
-            onChecked={(chk) => handleSelectChange("chk7", chk ? "7" : "")}
-            disabled={fieldDisable}
-          />
-          <UICheckbox
-            label="기타"
-            value="chk8"
-            onChecked={(chk) => handleSelectChange("chk8", chk ? "8" : "")}
-            disabled={fieldDisable}
-          />
-        </div>
       </div>
       <div className="pt-10 pb-10">
         <UITextarea
-          label="상세사유"
-          onChange={(e) => handleSelectChange("detailReason", e.target.value)}
-          error={errors.detailReason}
-          hint={errors.detailReason ? "필수값입니다." : ""}
+          label="인수인계 업무사항"
+          onChange={(e) => handleSelectChange("transferNote1", e.target.value)}
+          error={errors.transferNote1}
+          hint={errors.transferNote1 ? "필수값입니다." : ""}
+          readOnly={fieldDisable}
+        />
+      </div>
+      <div className="pt-10 pb-10">
+        <UITextarea
+          label="진행 및 미결사항"
+          onChange={(e) => handleSelectChange("transferNote2", e.target.value)}
+          error={errors.transferNote2}
+          hint={errors.transferNote2 ? "필수값입니다." : ""}
+          readOnly={fieldDisable}
+        />
+      </div>
+      <div className="pt-10 pb-10">
+        <UIInput
+          label="서류 및 비품"
+          onChange={(e) => handleSelectChange("transferNote3", e.target.value)}
+          error={errors.transferNote3}
+          hint={errors.transferNote3 ? "필수값입니다." : ""}
+          readOnly={fieldDisable}
+        />
+      </div>
+      <div className="pt-10 pb-10">
+        <UIInput
+          label="예산 및 자금"
+          onChange={(e) => handleSelectChange("transferNote4", e.target.value)}
+          error={errors.transferNote4}
+          hint={errors.transferNote4 ? "필수값입니다." : ""}
           readOnly={fieldDisable}
         />
       </div>
 
-
+      
       <div className="applyAction">
         <UIAlert
           description="저장하시겠습니까?"

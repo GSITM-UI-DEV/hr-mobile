@@ -13,10 +13,10 @@ type TextAreaProps = {
     maxLength?: number;
     value?: string | number;
     defaultValue?: string | number;
-    onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    onChange?: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
 };
 
-export const UITextarea = ({ defaultValue = "", value = "", maxLength = 100, placeholder = "입력해주세요", error = false, disabled = false, readOnly = false, label, hint }: TextAreaProps) => {
+export const UITextarea = ({ defaultValue = "", value = "", maxLength = 100, placeholder = "입력해주세요", error = false, disabled = false, readOnly = false, label, hint, onChange }: TextAreaProps) => {
     const [textareaValue, setTextareaValue] = useState<string | number>(defaultValue || value || "");
     const [charCount, setCharCount] = useState(0);
 
@@ -30,6 +30,7 @@ export const UITextarea = ({ defaultValue = "", value = "", maxLength = 100, pla
     const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
         setCharCount(e.target.value.length);
         setTextareaValue(e.target.value)
+        onChange && onChange(e);
     };
 
     return (

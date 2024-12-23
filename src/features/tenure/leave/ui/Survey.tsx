@@ -1,23 +1,25 @@
 import { axiosInstance } from "@/app/api/axiosInstance";
-import { useApprovalDocument, useApprovalForm, useApprovalLine } from "@/entities/approvalLine";
+import { useTenureLeaveSurvey } from "@/entities/tenure";
 import { useUser } from "@/entities/user";
-import { UIAlert, UIButton, UICheckbox, UIInput, UISelect, UITextarea, UIToast } from "@/shared/ui";
-import { useRef, useState } from "react";
+import { UIAlert, UIButton, UICheckbox, UISelect, UITextarea, UIToast } from "@/shared/ui";
+import { useState } from "react";
 
 
 export const Survey = () => {
   const [form, setForm] = useState({
-    rowStatus: "",
-    emplNo: "",
-    emplNameHan: "",
-    orgCode: "",
-    orgNameHan: "",
-    positionTitleName: "",
-    certiCodeKind: "",
-    certiCodeType: "",
+    emprt140Pop01List: [
+      {
+        retireReqDate: "",
+        surveyNo: "",
+        emplNo: "",
+        ans1: "",
+        ans2: "",
+        ans3: "",
+      }
+    ]
   });
   const [errors, setErrors] = useState({
-    certiCodeKind: false,
+    emprt140Pop01List: []
   });
   const [openToast, setOpenToast] = useState({ message: "", type: "", open: false });
 
@@ -26,30 +28,23 @@ export const Survey = () => {
 	if (isUserLoading) return <p>Loading...</p>;
 	if (userError) return <p>Error: {userError.message}</p>;
 
-  const { data: approvalFormData, isLoading: isApprovalFormLoading, error: approvalFormError } = useApprovalForm();
-  if (isApprovalFormLoading) return <p>Loading...</p>;
-  if (approvalFormError) return <p>Something went wrong!</p>;
-  const selectedForm = approvalFormData?.filter((i) => i.formId === "RT")[0]
   
-  const { data: approvalLineData, isLoading: isApprovalLineLoading, error: approvalLineError } = useApprovalLine({
-    formId: selectedForm?.formId,
+  const { data: tenureLeaveSurveyData, isLoading: isTenureLeaveSurveyLoading, error: tenureLeaveSurveyError } = useTenureLeaveSurvey({
     emplNo: userData.loginUserId,
+    retireReqDate: "20241127",
+    rtflowId: "A01",
   });
-  if (isApprovalLineLoading) return <p>Loading...</p>;
-  if (approvalLineError) return <p>Something went wrong!</p>;
-
-  const { data: approvalDocumentData, isLoading: isApprovalDocumentLoading, error: approvalDocumentError } = useApprovalDocument(userData.loginUserId);
-  if (isApprovalDocumentLoading) return <p>Loading...</p>;
-  if (approvalDocumentError) return <p>Something went wrong!</p>;
-
+	if (isTenureLeaveSurveyLoading) return <p>Loading...</p>;
+	if (tenureLeaveSurveyError) return <p>Error: {tenureLeaveSurveyError.message}</p>;
+  console.log(tenureLeaveSurveyData);
 
 
 
   const validateForm = () => {
     const newErrors = {
-      certiCodeKind: !form.certiCodeKind, // 공통 필수값 검증
+      emprt140Pop01List: [],
     };
-    setErrors(newErrors);
+    // setErrors(newErrors);
     return Object.values(newErrors).every((error) => !error);
   };
 
@@ -59,9 +54,20 @@ export const Survey = () => {
       return;
     } else {
       const formData = new URLSearchParams();
-      Object.entries(form).forEach(([key, value]) => {
-        formData.append(key, value);
-      });
+      const appendFormData = (data: any, parentKey = '') => {
+        if (typeof data === 'object' && !Array.isArray(data)) {
+          Object.entries(data).forEach(([key, value]) => {
+            appendFormData(value, parentKey ? `${parentKey}.${key}` : key);
+          });
+        } else if (Array.isArray(data)) {
+          data.forEach((item, index) => {
+            appendFormData(item, `${parentKey}[${index}]`);
+          });
+        } else {
+          formData.append(parentKey, data);
+        }
+      };
+      appendFormData(form);
       try {
         const response = await axiosInstance.post("/one/picertprt/onepicertprt110", formData);
         if (response.status === 200 && response.data) {

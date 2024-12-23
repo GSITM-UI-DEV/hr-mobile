@@ -4,8 +4,7 @@ import { useParams } from "react-router-dom";
 
 export const TenureLeaveSurveyPage = () => {
   const detail = useParams();
-
-  console.log(detail);
+  // console.log(detail);
   return (
     <>
       <Navigation />

@@ -85,16 +85,12 @@
 
 // 복리후생 전체 조회
 export interface WelfareStatus {
-  // artmouInd: string,
-	// leaveCnt: string,
 	reqGbn: string,
-	reqGbnNm: string,
+	emplNo: string,
 	reqDate: string,
-	aprDate: string,
-	statusCode: string,
+	aprvDate: string,
+	statusCode: string
 }
-
-
 
 type FundAcct = {
   payacctNo: string,

@@ -7,6 +7,15 @@ import { useNavigate } from "react-router-dom";
 
 
 export const StudentLoan = () => {
+  const navigate = useNavigate();
+  const [openToast, setOpenToast] = useState({ message: "", type: "", open: false });
+
+  const [fieldDisable, setFieldDisable] = useState(false);
+  const [disableSave, setDisableSave] = useState(false);
+  const [disableApply, setDisableApply] = useState(true);
+
+
+
   const getToday = () => {
     const today = new Date();
     const month = today.getMonth() + 1;
@@ -44,7 +53,7 @@ export const StudentLoan = () => {
 
 
 
-  const [errors, setErrors] = useState<Record<string, boolean | object>>({
+  const [errors, setErrors] = useState<Record<string, any>>({
     reqSeqNo: false,
     reqDate: false,
     payDate: false,
@@ -64,11 +73,6 @@ export const StudentLoan = () => {
   }); // 에러 메시지 관리
 
 
-
-
-
-
-  const navigate = useNavigate();
   const { data, isLoading, error } = useStudentLoan();
   if (isLoading) return <p>Loading...</p>;
   if (error) return <p>Something went wrong!</p>;
@@ -104,21 +108,6 @@ export const StudentLoan = () => {
       {codeKey : cd.baseCode, codeName: cd.codeNameHan}
     ))
   )
-
-  console.log(codeData[9]);
-  console.log(codeData[14]);
-
-
-
-
-
-  
-  
-
-  
-
-
-
 
   const [fileField, setFileField] = useState<boolean>(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -209,6 +198,10 @@ export const StudentLoan = () => {
     const newErrors = {
       // certiCodeKind: !form.certiCodeKind, // 공통 필수값 검증
       resNoFamily: !form.resNoFamily,
+      reqSeqNo: !form.reqSeqNo,
+      reqDate: !form.reqDate,
+      payDate: !form.payDate,
+      atchFileId: !form.atchFileId,
       shpayreq: {
         relCode: !form.shpayreq.relCode,
         schoolKindCode: !form.shpayreq.schoolKindCode,
@@ -225,9 +218,11 @@ export const StudentLoan = () => {
     return Object.values(newErrors).every((error) => !error);
   };
 
+
+
+
   // 신청하기
-  const [openToast, setOpenToast] = useState({ message: "", type: "", open: false });
-  const handleApply = async () => {
+  const handleSave = async () => {
     if (!validateForm()) {
       // setOpenToast({ message: "필수 값을 입력해주세요.", type: "danger", open: true });
       return;
@@ -248,12 +243,18 @@ export const StudentLoan = () => {
       };
       appendFormData(form);
       try {
-        const { data } = await axiosInstance.post('/wlf/wlfstuapply/wlfstuapply111/req', formData);
-        if (data > 0) {
-          setOpenToast({message: "결재요청이 완료되었습니다.", open: true, type: "success"});
+        const response = await axiosInstance.post('/wlf/wlfstuapply/wlfstuapply111', formData);
+        if (response.status === 200 && response.data) {
+          setOpenToast({ message: "임시저장이 완료되었습니다.", type: "success", open: true });
           setTimeout(() => {
+            setFieldDisable(true);
             setOpenToast((prev) => ({ ...prev, open: false }));
-            navigate('/welfare')
+            setDisableSave(true);
+            setDisableApply(false);
+            setForm((prevForm) => ({
+              ...prevForm,
+              statusCode: "3",
+            }));
           }, 1000);
         } else {
           setOpenToast({message: "결재요청에 이상이 있습니다.", open: true, type: "danger"});
@@ -261,6 +262,46 @@ export const StudentLoan = () => {
       } catch (error: any) {
         setOpenToast({message: error.response.data.message, open: true, type: "danger"});
       }
+    }
+  }
+
+
+  const handleApply = async () => {
+    const formData = new URLSearchParams();
+    const appendFormData = (data: any, parentKey = '') => {
+      if (typeof data === 'object' && !Array.isArray(data)) {
+        Object.entries(data).forEach(([key, value]) => {
+          appendFormData(value, parentKey ? `${parentKey}.${key}` : key);
+        });
+      } else if (Array.isArray(data)) {
+        data.forEach((item, index) => {
+          appendFormData(item, `${parentKey}[${index}]`);
+        });
+      } else {
+        formData.append(parentKey, data);
+      }
+    };
+    appendFormData(form);
+    try {
+      const { data } = await axiosInstance.post('/wlf/wlfstuapply/wlfstuapply111/req', formData);
+      if (data === true) {
+        setOpenToast({message: "신청이 완료되었습니다.", open: true, type: "success"});
+        setTimeout(() => {
+          setOpenToast((prev) => ({ ...prev, open: false }));
+          setDisableApply(true);
+          navigate("/welfare");
+        }, 1000);
+      } else {
+        setOpenToast({message: "요청에 이상이 있습니다.", open: true, type: "danger"});
+        setTimeout(() => {
+          setOpenToast((prev) => ({ ...prev, open: false }));
+        }, 1000);
+      }
+    } catch (error: any) {
+      setOpenToast({message: error.response.data.message, open: true, type: "danger"});
+      setTimeout(() => {
+        setOpenToast((prev) => ({ ...prev, open: false }));
+      }, 1000);
     }
   }
 
@@ -275,8 +316,8 @@ export const StudentLoan = () => {
             handleSelectChange("resNoFamily", value.qs1);
             handleSelectChange("shpayreq.relCode", value.qs2);
           }}
-          // error={errors.resNoFamily}
-          // hint={errors.resNoFamily ? "필수값입니다." : ""}
+          error={errors.resNoFamily}
+          hint={errors.resNoFamily ? "필수값입니다." : ""}
         />
       </div>
       <div className="pt-10 pb-10">
@@ -289,8 +330,8 @@ export const StudentLoan = () => {
             handleInputChange("shpayreq.reqAmt", 300000)
             handleInputChange("shpayreq.payAmt", 300000)
           }}
-          // error={errors.shpayreq.schoolKindCode}
-          // hint={errors.shpayreq.schoolKindCode ? "필수값입니다." : ""}
+          error={errors.shpayreq.schoolKindCode}
+          hint={errors.shpayreq.schoolKindCode ? "필수값입니다." : ""}
         />
       </div>
       <div className="pt-10 pb-10">
@@ -304,8 +345,8 @@ export const StudentLoan = () => {
               {label: "고등학교", error: false, query: "HS"}
             ]}
             onQuerySelect={(value) => handleSelectChange("shpayreq.schoolCodeInd", value)}
-            // error={errors.eventDate}
-            // hint={errors.eventDate ? "필수값입니다." : ""}
+            error={errors.eventDate}
+            hint={errors.eventDate ? "필수값입니다." : ""}
           />
         :
           <UISelect
@@ -315,17 +356,30 @@ export const StudentLoan = () => {
               {label: "대학교", error: false, query: "US"},
             ]}
             onQuerySelect={(value) => handleSelectChange("shpayreq.schoolCodeInd", value)}
+            error={errors.shpayreq.schoolCodeInd}
+            hint={errors.shpayreq.schoolCodeInd ? "필수값입니다." : ""}
           />
         }
       </div>
       {form.shpayreq.schoolKindCode === 'ED' &&
         <>
           <div className="pt-10 pb-10">
-            <UIInput label="학교명" onChange={(e) => handleInputChange("shpayreq.schoolNameHan", e.target.value) } />
+            <UIInput
+              label="학교명"
+              onChange={(e) => handleInputChange("shpayreq.schoolNameHan", e.target.value) }
+              error={errors.shpayreq.schoolNameHan}
+              hint={errors.shpayreq.schoolNameHan ? "필수값입니다." : ""}
+            />
           </div>
           <div className="pt-10 pb-10 d-flex gap-8">
             <div className="d-flex">
-              <UIInput label="학년" type="number" onChange={(e) => handleInputChange("shpayreq.schYear", e.target.value) } />
+              <UIInput
+                label="학년"
+                type="number"
+                onChange={(e) => handleInputChange("shpayreq.schYear", e.target.value) }
+                error={errors.shpayreq.schYear}
+                hint={errors.shpayreq.schYear ? "필수값입니다." : ""}
+              />
             </div>
             <div className="d-flex">
               <UISelect label="학기(분기)" items={[
@@ -335,6 +389,8 @@ export const StudentLoan = () => {
                   {label: "4", error: false, query: "4"},
                 ]}
                 onQuerySelect={(value) => handleSelectChange("shpayreq.semesterCode", value)}
+                error={errors.shpayreq.schYear}
+                hint={errors.shpayreq.schYear ? "필수값입니다." : ""}
               />
             </div>
           </div>
@@ -345,6 +401,8 @@ export const StudentLoan = () => {
           readOnly={form.shpayreq.schoolKindCode === 'EN'}
           value={form.shpayreq.schoolKindCode === 'EN' ? 300000 : ''}
           onChange={(e) => handleInputChange("shpayreq.reqAmt", e.target.value) }
+          error={errors.shpayreq.reqAmt}
+          hint={errors.shpayreq.reqAmt ? "필수값입니다." : ""}
         />
       </div>
       <div className="pt-10 pb-10">
@@ -353,6 +411,8 @@ export const StudentLoan = () => {
           type="date"
           readOnly={form.shpayreq.schoolKindCode === 'EN'}
           onDateSelect={(value) => handleSelectChange("payDate", value)}
+          error={errors.payDate}
+          hint={errors.payDate ? "필수값입니다." : ""}
         />
       </div>
 
@@ -366,7 +426,13 @@ export const StudentLoan = () => {
             onChange={handleFileChange}
             multiple // multiple 속성 추가
           />
-          <UIInput label="첨부파일" placeholder="증빙서류첨부" disabled />
+          <UIInput
+            label="첨부파일"
+            placeholder="증빙서류첨부"
+            disabled
+            error={errors.atchFileId}
+            hint={errors.atchFileId ? "필수값입니다." : ""}
+          />
           <UIIconButton onClick={handleFileClick} className="is-file has-pressed-action" />
         </div>
         {selectedFiles && (
@@ -381,7 +447,18 @@ export const StudentLoan = () => {
         )}
       </div>
 
+
       <div className="applyAction">
+        <UIAlert
+          description="저장하시겠습니까?"
+          actionProps={{
+            onClick: () => {
+              handleSave();
+            },
+          }}
+        >
+          <UIButton type="border" disabled={disableSave}>저장</UIButton>
+        </UIAlert>
         <UIAlert
           description="신청하시겠습니까?"
           actionProps={{
@@ -390,7 +467,7 @@ export const StudentLoan = () => {
             },
           }}
         >
-          <UIButton type="primary">결재요청</UIButton>
+          <UIButton type="primary" disabled={disableApply}>결재요청</UIButton>
         </UIAlert>
       </div>
       <UIToast message={openToast.message} type={openToast.type} open={openToast.open} onOpenChange={setOpenToast} />

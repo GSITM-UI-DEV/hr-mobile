@@ -5,11 +5,19 @@ import { useFundBank } from "@/entities/welfare";
 import { formatByType } from "@/shared/lib/formatByType";
 import { UIAlert, UIButton, UIDatePicker, UIIconButton, UIInput, UISelect, UIToast } from "@/shared/ui";
 import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 
 
 
 export const Fund = () => {
+  const navigate = useNavigate();
+  const [openToast, setOpenToast] = useState({ message: "", type: "", open: false });
+
+  const [fieldDisable, setFieldDisable] = useState(false);
+  const [disableSave, setDisableSave] = useState(false);
+  const [disableApply, setDisableApply] = useState(true);
+
   const [reason, setReason] = useState();
   const [relation, setRelation] = useState([]);
   const [form, setForm] = useState({
@@ -233,29 +241,26 @@ export const Fund = () => {
 
   // 선택값 변경
   const handleSelectChange = (field: string, value: any) => {
-    setForm((prevForm) => ({ ...prevForm, [field]: value }));
+      setForm((prevForm: any) => {
+      const keys = field.split(".");
+      let updatedForm = { ...prevForm };
+      let current: any = updatedForm;
+      keys.forEach((key: any, index) => {
+        // 배열 처리를 위한 검사
+        if (Array.isArray(current) && !isNaN(Number(key))) {
+          key = Number(key); // 인덱스를 숫자로 변환
+        }
+        if (index === keys.length - 1) {
+          current[key] = value; // 값 설정
+        } else {
+          current[key] = current[key] ? { ...current[key] } : {};
+          current = current[key];
+        }
+      });
+      return updatedForm;
+    });
     setErrors((prevErrors) => ({ ...prevErrors, [field]: false })); // Clear error on change
   };
-  // const handleSelectChange = (field: string, value: any) => {
-  //   setForm((prevForm: any) => {
-  //     const keys = field.split(".");
-  //     let updatedForm = { ...prevForm };
-  //     let current: any = updatedForm;
-  //     keys.forEach((key: any, index) => {
-  //       // 배열 처리를 위한 검사
-  //       if (Array.isArray(current) && !isNaN(Number(key))) {
-  //         key = Number(key); // 인덱스를 숫자로 변환
-  //       }
-  //       if (index === keys.length - 1) {
-  //         current[key] = value; // 값 설정
-  //       } else {
-  //         current[key] = current[key] ? { ...current[key] } : {};
-  //         current = current[key];
-  //       }
-  //     });
-  //     return updatedForm;
-  //   });
-  // };
 
 
 
@@ -274,50 +279,88 @@ export const Fund = () => {
   };
 
 
-  // 신청하기
-  const [openToast, setOpenToast] = useState({ message: "", type: "", open: false });
-  const handleApply = async () => {
+  const handleSave = async () => {
     if (!validateForm()) {
-      // setOpenToast({ message: "필수 값을 입력해주세요.", type: "danger", open: true });
       return;
     } else {
       const formData = new URLSearchParams();
-      Object.entries(form).forEach(([key, value]) => {
-        formData.append(key, value);
-      });
+      const appendFormData = (data: any, parentKey = '') => {
+        if (typeof data === 'object' && !Array.isArray(data)) {
+          Object.entries(data).forEach(([key, value]) => {
+            appendFormData(value, parentKey ? `${parentKey}.${key}` : key);
+          });
+        } else if (Array.isArray(data)) {
+          data.forEach((item, index) => {
+            appendFormData(item, `${parentKey}[${index}]`);
+          });
+        } else {
+          formData.append(parentKey, data);
+        }
+      };
+      appendFormData(form);
 
       try {
         const response = await axiosInstance.post("/uhr/docappr/apprcn600", formData);
         if (response.status === 200 && response.data) {
-          setOpenToast({ message: "결재요청이 완료되었습니다.", type: "success", open: true });
-          // navigate("/certificate/print");
+          setOpenToast({ message: "임시저장이 완료되었습니다.", type: "success", open: true });
+          setTimeout(() => {
+            setFieldDisable(true);
+            setOpenToast((prev) => ({ ...prev, open: false }));
+            setDisableSave(true);
+            setDisableApply(false);
+            setForm((prevForm) => ({
+              ...prevForm,
+              statusCode: "3",
+            }));
+          }, 1000);
         } else {
-          setOpenToast({ message: "결재요청에 실패하였습니다.", type: "danger", open: true });
+          setOpenToast({ message: "요청에 이상이 있습니다.", type: "danger", open: true });
         }
       } catch (error: any) {
         setOpenToast({ message: error.response?.data?.message || "오류가 발생하였습니다.", type: "danger", open: true });
       }
     }
+  }
 
-    // const formData = new URLSearchParams();
-    // const appendFormData = (data: any, parentKey = '') => {
-    //   if (typeof data === 'object' && !Array.isArray(data)) {
-    //     Object.entries(data).forEach(([key, value]) => {
-    //       appendFormData(value, parentKey ? `${parentKey}.${key}` : key);
-    //     });
-    //   } else if (Array.isArray(data)) {
-    //     data.forEach((item, index) => {
-    //       appendFormData(item, `${parentKey}[${index}]`);
-    //     });
-    //   } else {
-    //     formData.append(parentKey, data);
-    //   }
-    // };  
-    // appendFormData(form);
-    // try {
-    //   const { data } = await axiosInstance.post('/uhr/docappr/apprcn600', formData);
-    // } catch {
-    // }
+
+  // 신청하기
+  const handleApply = async () => {
+    const formData = new URLSearchParams();
+    const appendFormData = (data: any, parentKey = '') => {
+      if (typeof data === 'object' && !Array.isArray(data)) {
+        Object.entries(data).forEach(([key, value]) => {
+          appendFormData(value, parentKey ? `${parentKey}.${key}` : key);
+        });
+      } else if (Array.isArray(data)) {
+        data.forEach((item, index) => {
+          appendFormData(item, `${parentKey}[${index}]`);
+        });
+      } else {
+        formData.append(parentKey, data);
+      }
+    };
+    appendFormData(form);
+    try {
+      const { data } = await axiosInstance.post('/system/aprvlineset', formData);
+      if (data === true) {
+        setOpenToast({message: "신청이 완료되었습니다.", open: true, type: "success"});
+        setTimeout(() => {
+          setOpenToast((prev) => ({ ...prev, open: false }));
+          setDisableApply(true);
+          navigate("/welfare");
+        }, 1000);
+      } else {
+        setOpenToast({message: "요청에 이상이 있습니다.", open: true, type: "danger"});
+        setTimeout(() => {
+          setOpenToast((prev) => ({ ...prev, open: false }));
+        }, 1000);
+      }
+    } catch (error: any) {
+      setOpenToast({message: error.response.data.message, open: true, type: "danger"});
+      setTimeout(() => {
+        setOpenToast((prev) => ({ ...prev, open: false }));
+      }, 1000);
+    }
   }
 
   
@@ -416,6 +459,16 @@ export const Fund = () => {
 
       <div className="applyAction">
         <UIAlert
+          description="저장하시겠습니까?"
+          actionProps={{
+            onClick: () => {
+              handleSave();
+            },
+          }}
+        >
+          <UIButton type="border" disabled={disableSave}>저장</UIButton>
+        </UIAlert>
+        <UIAlert
           description="신청하시겠습니까?"
           actionProps={{
             onClick: () => {
@@ -423,7 +476,7 @@ export const Fund = () => {
             },
           }}
         >
-          <UIButton type="primary">결재요청</UIButton>
+          <UIButton type="primary" disabled={disableApply}>결재요청</UIButton>
         </UIAlert>
       </div>
       <UIToast message={openToast.message} type={openToast.type} open={openToast.open} onOpenChange={setOpenToast} />

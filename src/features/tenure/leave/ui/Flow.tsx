@@ -73,9 +73,10 @@ export const Flow = () => {
             <li key={i}>
               <div className="list__content">
                 {item.statusCode === "N" ?
-                  <Link to={item.rtflowType === "01" ? `/tenure/leave-survey/${item.lastWorkDate}` // 퇴직설문
-                      : item.rtflowType === "05" ? `/tenure/leave-resignation/${item.lastWorkDate}`
-                      : item.rtflowType === "03" ? "https://hrmreport.dbhitek.com"
+                  <Link to={item.rtflowId === "A01" ? `/tenure/leave-survey/${item.lastWorkDate}` // 퇴직설문
+                      : item.rtflowId === "A08" ? `/tenure/leave-resignation/${item.lastWorkDate}`
+                      : item.rtflowId === "A09" ? `/tenure/leave-handover/${item.lastWorkDate}`
+                      : item.rtflowId === "D01" ? "https://hrmreport.dbhitek.com"
                       : `/tenure/leave-flow/${item.rtflowId}-${item.reqDate}-${item.emplNo}-${item.lastWorkDate}`
                     }
                     className="top pb-20"

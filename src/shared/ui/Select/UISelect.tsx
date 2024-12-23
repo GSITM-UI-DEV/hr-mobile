@@ -16,7 +16,7 @@ type UISelectProps = {
     placeholder?: string | undefined | null;
     label?: string;
     hint?: string;
-    error?: boolean;
+    error?: boolean | object | undefined;
     disabled?: boolean;
     readOnly?: boolean;
     defaultValue?: string;
