@@ -96,7 +96,7 @@ export const Severance = () => {
           <div className="noti"><div className="icon is-system is-info"></div>[퇴직금 산정 기준]</div>
           <ul>
             <li className="pb-40">
-              <div className="text-underline pb-10">1. 퇴직금은 [ 최근 1개월 평균급여 X 근속연수 ]로 구해집니다.</div>
+              <div className="text-underline pb-10">1. 퇴직금은 [ 최근 3개월 평균급여 X 근속연수 ]로 구해집니다.</div>
 
               이때, "최근 3개월 평균급여"란 최근 3개월간 지급받은 기본급, 수당(직책수당, 자격수당, 할증수당, 차량유지비 등),
               년중 특정시기에 지급되는 급여항목(성과급, 상여, 전년 연차보상)의 3개월치를 포함합니다.

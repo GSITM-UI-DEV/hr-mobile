@@ -1,5 +1,11 @@
 export type {
-	Report,
-  Survey,
+  EducationSurvey,
+  EducationReport
 } from './model/types';
-export { useEducation } from './api/useEducation';
+
+
+
+export {
+  useEducationSurvey,
+  useEducationReport
+} from './api/useEducation';

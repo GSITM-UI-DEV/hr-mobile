@@ -13,11 +13,14 @@ import { useNavigate } from 'react-router-dom';
 export const TwoFactor = () => {
 	// const [cookies, setCookie, removeCookie] = useCookies();
 	const { auth, setAuth2FA } = useAuthStore();
-	// 개발 2차 인증 보임
+	
+	// 개발배포
 	const [confirmKey, setConfirmKey] = useState(auth?.sndConfirmKey);
 
-	// 운영 2차 인증키 감춤
+	// 운영배포
 	// const [confirmKey, setConfirmKey] = useState("");
+
+
 	const navigate = useNavigate();
 	const coCode = auth?.coCode;
 	const username = auth?.username;
@@ -56,8 +59,14 @@ export const TwoFactor = () => {
 				2차 인증
 			</div>
 			<div className="pt-30 pb-30">
+
+				{/* 개발배포 */}
 				<UIInput type="text" placeholder="ABCDEFG" value={confirmKey} onChange={(e) => setConfirmKey(e.target.value)} />
+
+				{/* 운영배포 */}
 				{/* <UIInput type="text" placeholder="인증코드를 입력해주세요." onChange={(e) => setConfirmKey(e.target.value)} /> */}
+
+
 			</div>
 			<div className="d-flex justify-content-center">
 				<UIButton type="primary" onClick={() => {

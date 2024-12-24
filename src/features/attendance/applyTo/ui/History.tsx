@@ -44,7 +44,7 @@ export const History = () => {
   const { data: approvalFormData, isLoading: isApprovalFormLoading, error: approvalFormError } = useApprovalForm();
   if (isApprovalFormLoading) return <p>Loading...</p>;
   if (approvalFormError) return <p>Something went wrong!</p>;
-  const selectedForm = approvalFormData?.filter((i) => i.formName === "CH")[0]
+  const selectedForm = approvalFormData?.filter((i) => i.formId === "CH")[0]
   
   const auth = useAuthStore((state) => state.auth);
   const { data: approvalLineData, isLoading: isApprovalLineLoading, error: approvalLineError } = useApprovalLine({
